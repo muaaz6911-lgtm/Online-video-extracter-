@@ -1,442 +1,236 @@
 const express = require("express");
-const multer = require("multer");
-const { spawn } = require("child_process");
-const ffmpegPath = require("ffmpeg-static");
 const path = require("path");
-const fs = require("fs");
+const dns = require("dns").promises;
+const net = require("net");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const uploadDir = path.join(__dirname, "uploads");
-const outputDir = path.join(__dirname, "outputs");
-
-fs.mkdirSync(uploadDir, { recursive: true });
-fs.mkdirSync(outputDir, { recursive: true });
-
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const jobs = {};
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-
-  filename: (req, file, cb) => {
-    const unique =
-      Date.now() + "-" +
-      Math.round(Math.random() * 1e9);
-
-    cb(
-      null,
-      unique + path.extname(file.originalname)
+function isPrivateIP(ip) {
+  if (net.isIPv4(ip)) {
+    return (
+      ip.startsWith("10.") ||
+      ip.startsWith("127.") ||
+      ip.startsWith("192.168.") ||
+      ip.startsWith("169.254.") ||
+      /^172\.(1[6-9]|2\d|3[0-1])\./.test(ip) ||
+      ip === "0.0.0.0"
     );
   }
-});
 
-const upload = multer({
-  storage,
+  if (net.isIPv6(ip)) {
+    const value = ip.toLowerCase();
 
-  limits: {
-    fileSize: 1024 * 1024 * 1024
+    return (
+      value === "::1" ||
+      value.startsWith("fc") ||
+      value.startsWith("fd") ||
+      value.startsWith("fe80")
+    );
   }
-});
 
-
-function timeToSeconds(time) {
-
-  const parts = time.split(":");
-
-  const hours = Number(parts[0]);
-  const minutes = Number(parts[1]);
-  const seconds = Number(parts[2]);
-
-  return (
-    hours * 3600 +
-    minutes * 60 +
-    seconds
-  );
-
+  return true;
 }
 
+async function validateURL(urlString) {
+  let url;
 
-/* =========================
-   CONVERT
-========================= */
+  try {
+    url = new URL(urlString);
+  } catch {
+    throw new Error("Please enter a valid URL.");
+  }
 
-app.post(
-  "/convert",
-  upload.single("media"),
-  (req, res) => {
+  if (
+    url.protocol !== "http:" &&
+    url.protocol !== "https:"
+  ) {
+    throw new Error("Only HTTP and HTTPS URLs are allowed.");
+  }
 
-    if (!req.file) {
+  const hostname = url.hostname.toLowerCase();
 
-      return res.status(400).json({
-        success: false,
-        error: "No file uploaded"
-      });
+  if (
+    hostname === "localhost" ||
+    hostname.endsWith(".localhost")
+  ) {
+    throw new Error("This URL is not allowed.");
+  }
 
+  if (net.isIP(hostname)) {
+    if (isPrivateIP(hostname)) {
+      throw new Error("Private network URLs are not allowed.");
     }
 
+    return url;
+  }
 
-    const format = req.body.format;
+  const addresses = await dns.lookup(hostname, {
+    all: true
+  });
 
+  if (
+    !addresses.length ||
+    addresses.some(item => isPrivateIP(item.address))
+  ) {
+    throw new Error("This URL is not allowed.");
+  }
 
+  return url;
+}
+
+function getFilename(urlString, contentType) {
+  const url = new URL(urlString);
+
+  let filename =
+    path.basename(url.pathname);
+
+  if (
+    !filename ||
+    filename === "/" ||
+    !filename.includes(".")
+  ) {
     if (
-      format !== "mp3" &&
-      format !== "mp4"
+      contentType &&
+      contentType.includes("webm")
     ) {
+      filename = "video.webm";
+    } else {
+      filename = "video.mp4";
+    }
+  }
 
-      return res.status(400).json({
-        success: false,
-        error: "Invalid format"
+  return filename.replace(
+    /[^a-zA-Z0-9._-]/g,
+    "_"
+  );
+}
+
+/* =====================
+   DIRECT MEDIA DOWNLOAD
+===================== */
+
+app.post("/api/download", async (req, res) => {
+  const { url } = req.body;
+
+  if (!url) {
+    return res.status(400).json({
+      success: false,
+      error: "Please paste a media URL."
+    });
+  }
+
+  try {
+    const safeURL = await validateURL(url);
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 30000);
+
+    let response;
+
+    try {
+      response = await fetch(safeURL, {
+        redirect: "follow",
+        signal: controller.signal,
+        headers: {
+          "User-Agent": "Video-Extractor/1.0"
+        }
       });
-
+    } finally {
+      clearTimeout(timeout);
     }
 
+    if (!response.ok) {
+      throw new Error(
+        `Could not fetch file. Server returned ${response.status}.`
+      );
+    }
 
-    const jobId =
-      Date.now() + "-" +
-      Math.random()
-        .toString(36)
-        .substring(2, 10);
+    if (!response.body) {
+      throw new Error("The media file has no downloadable content.");
+    }
 
+    const contentType =
+      response.headers.get("content-type") || "";
 
-    const outputName =
-      jobId + "." + format;
-
-
-    const outputPath =
-      path.join(
-        outputDir,
-        outputName
+    const filename =
+      getFilename(
+        response.url || safeURL.toString(),
+        contentType
       );
 
+    res.setHeader(
+      "Content-Type",
+      contentType || "application/octet-stream"
+    );
 
-    jobs[jobId] = {
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${filename}"`
+    );
 
-      progress: 0,
+    const contentLength =
+      response.headers.get("content-length");
 
-      status: "processing",
-
-      download: null,
-
-      error: null
-
-    };
-
-
-    let args;
-
-
-    if (format === "mp3") {
-
-      args = [
-
-        "-i",
-        req.file.path,
-
-        "-vn",
-
-        "-codec:a",
-        "libmp3lame",
-
-        "-q:a",
-        "2",
-
-        "-y",
-
-        outputPath
-
-      ];
-
-    }
-
-    else {
-
-      args = [
-
-        "-i",
-        req.file.path,
-
-        "-c:v",
-        "libx264",
-
-        "-preset",
-        "veryfast",
-
-        "-c:a",
-        "aac",
-
-        "-y",
-
-        outputPath
-
-      ];
-
-    }
-
-
-    let duration = 0;
-
-
-    const ffmpeg =
-      spawn(
-        ffmpegPath,
-        args
+    if (contentLength) {
+      res.setHeader(
+        "Content-Length",
+        contentLength
       );
+    }
 
+    const reader =
+      response.body.getReader();
 
-    ffmpeg.stderr.on(
-      "data",
-      (data) => {
-
-        const text =
-          data.toString();
-
-
-        /* Get total duration */
-
-        const durationMatch =
-          text.match(
-            /Duration: (\d{2}:\d{2}:\d{2}\.\d{2})/
-          );
-
-
-        if (durationMatch) {
-
-          duration =
-            timeToSeconds(
-              durationMatch[1]
-            );
-
-        }
-
-
-        /* Get current conversion time */
-
-        const timeMatch =
-          text.match(
-            /time=(\d{2}:\d{2}:\d{2}\.\d{2})/
-          );
-
-
-        if (
-          timeMatch &&
-          duration > 0
-        ) {
-
-          const current =
-            timeToSeconds(
-              timeMatch[1]
-            );
-
-
-          let percent =
-            Math.floor(
-              (
-                current /
-                duration
-              ) * 100
-            );
-
-
-          if (percent > 99) {
-            percent = 99;
-          }
-
-
-          if (percent < 0) {
-            percent = 0;
-          }
-
-
-          jobs[jobId].progress =
-            percent;
-
-        }
-
-      }
-    );
-
-
-    ffmpeg.on(
-      "error",
-      (error) => {
-
-        console.error(error);
-
-
-        jobs[jobId].status =
-          "error";
-
-
-        jobs[jobId].error =
-          "FFmpeg could not start.";
-
-
-        if (
-          fs.existsSync(
-            req.file.path
-          )
-        ) {
-
-          fs.unlinkSync(
-            req.file.path
-          );
-
-        }
-
-      }
-    );
-
-
-    ffmpeg.on(
-      "close",
-      (code) => {
-
-        /* Delete uploaded file */
-
-        if (
-          fs.existsSync(
-            req.file.path
-          )
-        ) {
-
-          fs.unlink(
-            req.file.path,
-            () => {}
-          );
-
-        }
-
-
-        if (code === 0) {
-
-          jobs[jobId].progress =
-            100;
-
-
-          jobs[jobId].status =
-            "complete";
-
-
-          jobs[jobId].download =
-            "/download/" +
-            outputName;
-
-        }
-
-        else {
-
-          jobs[jobId].status =
-            "error";
-
-
-          jobs[jobId].error =
-            "Conversion failed.";
-
-        }
-
-      }
-    );
-
-
-    res.json({
-
-      success: true,
-
-      jobId
-
+    res.on("close", () => {
+      try {
+        reader.cancel();
+      } catch {}
     });
 
-  }
-);
+    while (true) {
+      const { done, value } =
+        await reader.read();
 
+      if (done) break;
 
-/* =========================
-   PROGRESS
-========================= */
+      if (!res.write(Buffer.from(value))) {
+        await new Promise(resolve =>
+          res.once("drain", resolve)
+        );
+      }
+    }
 
-app.get(
-  "/progress/:jobId",
-  (req, res) => {
+    res.end();
 
-    const job =
-      jobs[
-        req.params.jobId
-      ];
+  } catch (error) {
+    console.error(error);
 
-
-    if (!job) {
-
-      return res.status(404).json({
-
-        error: "Job not found"
-
+    if (!res.headersSent) {
+      res.status(400).json({
+        success: false,
+        error:
+          error.name === "AbortError"
+            ? "Request timed out."
+            : error.message
       });
-
     }
-
-
-    res.json(job);
-
   }
-);
+});
 
+app.listen(PORT, () => {
+  console.log(
+    `Video Extractor running on port ${PORT}`
+  );
+});      
 
-/* =========================
-   DOWNLOAD
-========================= */
+    
 
-app.get(
-  "/download/:file",
-  (req, res) => {
-
-    const safeFile =
-      path.basename(
-        req.params.file
-      );
-
-
-    const filePath =
-      path.join(
-        outputDir,
-        safeFile
-      );
-
-
-    if (
-      !fs.existsSync(filePath)
-    ) {
-
-      return res.status(404).send(
-        "File not found"
-      );
-
-    }
-
-
-    res.download(
-      filePath
-    );
-
-  }
-);
-
-
-/* =========================
-   START SERVER
-========================= */
-
-app.listen(
-  PORT,
-  () => {
-
-    console.log(
-      `Video Extractor running on port ${PORT}`
-    );
-
-  }
-);
+        
+    
