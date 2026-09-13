@@ -1,1 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Video Extractor</title>
+
+  <style>
+    :root {
+      --accent: #8b5cf6;
+      --accent2: #2563eb;
+      --bg: #080b14;
+      --glass: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.10);
+      --muted: #a1a1b5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Background */
+
+    .background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .blob {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.22;
+      filter: blur(130px);
+      animation: float 12s infinite ease-in-out;
+    }
+
+    .blob1 {
+      top: -150px;
+      left: -150px;
+    }
+
+    .blob2 {
+      right: -150px;
+      bottom: -150px;
+      background: var(--accent2);
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0);
+      }
+
+      50% {
+        transform: translate(70px, 50px);
+      }
+    }
+
+    /* Navbar */
+
+    nav {
+      width: min(1100px, 90%);
+      margin: 20px auto;
+      padding: 16px 20px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      background: var(--glass);
+      backdrop-filter: blur(25px);
+
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .themes {
+      display: flex;
+      gap: 10px;
+    }
+
+    .theme {
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.5);
+      transition: 0.3s;
+    }
+
+    .theme:hover {
+      transform: scale(1.2);
+    }
+
+    .purple { background: #8b5cf6; }
+    .red { background: #ef4444; }
+    .blue { background: #3b82f6; }
+    .grey { background: #6b7280; }
+
+    /* Main */
+
+    main {
+      width: min(850px, 90%);
+      margin: 80px auto;
+      text-align: center;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 9px 17px;
+      border-radius: 30px;
+
+      background: var(--glass);
+      border: 1px solid var(--border);
+
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 25px 0 15px;
+      font-size: clamp(45px, 8vw, 80px);
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .description {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Converter */
+
+    .converter {
+      margin-top: 45px;
+      padding: 30px;
+
+      background: var(--glass);
+      backdrop-filter: blur(30px);
+
+      border: 1px solid var(--border);
+      border-radius: 28px;
+    }
+
+    /* Tabs */
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .tab {
+      padding: 12px 28px;
+      border-radius: 14px;
+      cursor: pointer;
+
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+
+      transition: 0.3s;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Upload */
+
+    .upload-area {
+      min-height: 210px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      padding: 40px 20px;
+
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 20px;
+
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .upload-area:active {
+      transform: scale(0.98);
+    }
+
+    #fileInput {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .upload-icon {
+      font-size: 45px;
+      margin-bottom: 15px;
+    }
+
+    .upload-title {
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .upload-subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* File info */
+
+    .file-info {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+
+      text-align: left;
+
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    .file-name {
+      font-weight: bold;
+      word-break: break-word;
+    }
+
+    .file-size {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Button */
+
+    .convert-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 17px;
+
+      border: none;
+      border-radius: 15px;
+
+      cursor: pointer;
+
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+
+      background: linear-gradient(
+        135deg,
+        var(--accent),
+        var(--accent2)
+      );
+
+      transition: 0.3s;
+    }
+
+    .convert-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .convert-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Progress */
+
+    .progress-box {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    #percentage {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .bar {
+      height: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+
+      background: linear-gradient(
+        90deg,
+        var(--accent),
+        var(--accent2)
+      );
+
+      transition: width 0.3s;
+    }
+
+    .eta {
+      margin-top: 13px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Result */
+
+    .result {
+      display: none;
+      margin-top: 25px;
+      padding: 25px;
+
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 20px;
+    }
+
+    .success {
+      font-size: 40px;
+      color: #86efac;
+    }
+
+    #resultInfo {
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .download {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 15px 30px;
+
+      border-radius: 14px;
+
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+
+      background: #16a34a;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin: 60px auto;
+      }
+
+      .converter {
+        padding: 18px;
+      }
+
+      .tab {
+        padding: 11px 20px;
+      }
+
+      .logo {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="background">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+  </div>
+
+  <nav>
+    <div class="logo">
+      VIDEO <span>EXTRACTOR</span>
+    </div>
+
+    <div class="themes">
+      <div class="theme purple" onclick="setTheme('purple')"></div>
+      <div class="theme red" onclick="setTheme('red')"></div>
+      <div class="theme blue" onclick="setTheme('blue')"></div>
+      <div class="theme grey" onclick="setTheme('grey')"></div>
+    </div>
+  </nav>
+
+  <main>
+
+    <div class="tag">
+      ⚡ Personal Media Converter
+    </div>
+
+    <h1>
+      Convert Your <span>Media</span>
+    </h1>
+
+    <p class="description">
+      Upload your video or audio and convert it
+      into MP3 or MP4.
+    </p>
+
+    <div class="converter">
+
+      <div class="tabs">
+        <div
+          class="tab active"
+          id="mp4Tab"
+          onclick="setFormat('mp4')"
+        >
+          🎬 MP4
+        </div>
+
+        <div
+          class="tab"
+          id="mp3Tab"
+          onclick="setFormat('mp3')"
+        >
+          🎵 MP3
+        </div>
+      </div>
+
+      <div
+        class="upload-area"
+        id="uploadArea"
+      >
+        <input
+          type="file"
+          id="fileInput"
+          accept="video/*,audio/*"
+        >
+
+        <div class="upload-icon">📁</div>
+
+        <div class="upload-title">
+          Click to select media
+        </div>
+
+        <div class="upload-subtitle">
+          Select a video or audio file
+        </div>
+      </div>
+
+      <div
+        class="file-info"
+        id="fileInfo"
+      >
+        <div
+          class="file-name"
+          id="fileName"
+        ></div>
+
+        <div
+          class="file-size"
+          id="fileSize"
+        ></div>
+      </div>
+
+      <button
+        class="convert-btn"
+        id="convertBtn"
+      >
+        Convert to MP4
+      </button>
+
+      <div
+        class="progress-box"
+        id="progressBox"
+      >
+        <div class="status">
+          <span id="statusText">
+            Preparing...
+          </span>
+
+          <span id="percentage">
+            0%
+          </span>
+        </div>
+
+        <div class="bar">
+          <div
+            class="progress"
+            id="progress"
+          ></div>
+        </div>
+
+        <div
+          class="eta"
+          id="eta"
+        >
+          Calculating time...
+        </div>
+      </div>
+
+      <div
+        class="result"
+        id="result"
+      >
+        <div class="success">✓</div>
+
+        <h2>
+          Conversion Complete!
+        </h2>
+
+        <p id="resultInfo"></p>
+
+        <a
+          id="download"
+          class="download"
+          download
+        >
+          Download ↓
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>
+    © 2026 Video Extractor
+  </footer>
+
+  <script>
+
+    let format = "mp4";
+    let selectedFile = null;
+
+    const uploadArea =
+      document.getElementById("uploadArea");
+
+    const fileInput =
+      document.getElementById("fileInput");
+
+    const fileInfo =
+      document.getElementById("fileInfo");
+
+    const fileName =
+      document.getElementById("fileName");
+
+    const fileSize =
+      document.getElementById("fileSize");
+
+    const convertBtn =
+      document.getElementById("convertBtn");
+
+
+    /* FORMAT */
+
+    function setFormat(type) {
+
+      format = type;
+
+      document
+        .getElementById("mp4Tab")
+        .classList
+        .remove("active");
+
+      document
+        .getElementById("mp3Tab")
+        .classList
+        .remove("active");
+
+      document
+        .getElementById(type + "Tab")
+        .classList
+        .add("active");
+
+      convertBtn.innerText =
+        "Convert to " +
+        type.toUpperCase();
+
+    }
+
+
+    /* UPLOAD CLICK */
+
+    uploadArea.addEventListener(
+      "click",
+      () => {
+        fileInput.click();
+      }
+    );
+
+
+    /* FILE SELECTED */
+
+    fileInput.addEventListener(
+      "change",
+      function() {
+
+        selectedFile =
+          this.files[0];
+
+        if (!selectedFile) return;
+
+        fileInfo.style.display =
+          "block";
+
+        fileName.innerText =
+          "📄 " +
+          selectedFile.name;
+
+        fileSize.innerText =
+          "💾 " +
+          formatBytes(
+            selectedFile.size
+          );
+
+        document
+          .getElementById("result")
+          .style.display =
+          "none";
+
+      }
+    );
+
+
+    function formatBytes(bytes) {
+
+      if (!bytes) {
+        return "0 Bytes";
+      }
+
+      const units = [
+        "Bytes",
+        "KB",
+        "MB",
+        "GB"
+      ];
+
+      const index =
+        Math.floor(
+          Math.log(bytes) /
+          Math.log(1024)
+        );
+
+      return (
+        bytes /
+        Math.pow(1024, index)
+      ).toFixed(2)
+        + " "
+        + units[index];
+
+    }
+
+
+    /* CONVERT */
+
+    convertBtn.addEventListener(
+      "click",
+      convertMedia
+    );
+
+
+    function convertMedia() {
+
+      if (!selectedFile) {
+
+        alert(
+          "Please select a file first!"
+        );
+
+        return;
+      }
+
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "media",
+        selectedFile
+      );
+
+      formData.append(
+        "format",
+        format
+      );
+
+
+      document
+        .getElementById("result")
+        .style.display =
+        "none";
+
+      document
+        .getElementById("progressBox")
+        .style.display =
+        "block";
+
+      convertBtn.disabled = true;
+
+      convertBtn.innerText =
+        "Uploading...";
+
+
+      const xhr =
+        new XMLHttpRequest();
+
+      const startTime =
+        Date.now();
+
+
+      xhr.upload.addEventListener(
+        "progress",
+        function(event) {
+
+          if (
+            event.lengthComputable
+          ) {
+
+            const percent =
+              Math.round(
+                event.loaded /
+                event.total *
+                100
+              );
+
+            document
+              .getElementById("progress")
+              .style.width =
+              percent + "%";
+
+            document
+              .getElementById("percentage")
+              .innerText =
+              percent + "%";
+
+            document
+              .getElementById("statusText")
+              .innerText =
+              "Uploading...";
+
+
+            const elapsed =
+              (
+                Date.now() -
+                startTime
+              ) / 1000;
+
+
+            if (elapsed > 0) {
+
+              const speed =
+                event.loaded /
+                elapsed;
+
+              const remaining =
+                (
+                  event.total -
+                  event.loaded
+                ) / speed;
+
+              if (
+                isFinite(remaining) &&
+                remaining > 0
+              ) {
+
+                document
+                  .getElementById("eta")
+                  .innerText =
+                  "Upload ETA: ~" +
+                  Math.ceil(remaining) +
+                  " seconds";
+
+              }
+
+            }
+
+          }
+
+        }
+      );
+
+
+      xhr.open(
+        "POST",
+        "/convert",
+        true
+      );
+
+
+      xhr.onload =
+        function() {
+
+          if (
+            xhr.status !== 200
+          ) {
+
+            handleError(
+              "Upload failed."
+            );
+
+            return;
+          }
+
+
+          const data =
+            JSON.parse(
+              xhr.responseText
+            );
+
+
+          if (!data.success) {
+
+            handleError(
+              data.error ||
+              "Something went wrong."
+            );
+
+            return;
+          }
+
+
+          convertBtn.innerText =
+            "Converting...";
+
+          checkProgress(
+            data.jobId
+          );
+
+        };
+
+
+      xhr.onerror =
+        function() {
+
+          handleError(
+            "Network error. Server may not be running."
+          );
+
+        };
+
+
+      xhr.send(formData);
+
+    }
+
+
+    /* CHECK PROGRESS */
+
+    function checkProgress(jobId) {
+
+      const interval =
+        setInterval(
+          async () => {
+
+            try {
+
+              const response =
+                await fetch(
+                  "/progress/" +
+                  jobId
+                );
+
+              const data =
+                await response.json();
+
+
+              document
+                .getElementById("progress")
+                .style.width =
+                data.progress + "%";
+
+              document
+                .getElementById("percentage")
+                .innerText =
+                data.progress + "%";
+
+
+              document
+                .getElementById("statusText")
+                .innerText =
+                "Converting...";
+
+
+              document
+                .getElementById("eta")
+                .innerText =
+                "Processing your media...";
+
+
+              if (
+                data.status ===
+                "complete"
+              ) {
+
+                clearInterval(interval);
+
+                document
+                  .getElementById(
+                    "progressBox"
+                  )
+                  .style.display =
+                  "none";
+
+                document
+                  .getElementById(
+                    "result"
+                  )
+                  .style.display =
+                  "block";
+
+                document
+                  .getElementById(
+                    "resultInfo"
+                  )
+                  .innerText =
+                  "Your " +
+                  format.toUpperCase() +
+                  " file is ready!";
+
+                document
+                  .getElementById(
+                    "download"
+                  )
+                  .href =
+                  data.download;
+
+                convertBtn.disabled =
+                  false;
+
+                convertBtn.innerText =
+                  "Convert to " +
+                  format.toUpperCase();
+
+              }
+
+
+              if (
+                data.status ===
+                "error"
+              ) {
+
+                clearInterval(interval);
+
+                handleError(
+                  data.error ||
+                  "Conversion failed."
+                );
+
+              }
+
+            }
+
+            catch {
+
+              clearInterval(interval);
+
+              handleError(
+                "Could not check progress."
+              );
+
+            }
+
+          },
+          800
+        );
+
+    }
+
+
+    function handleError(message) {
+
+      alert(message);
+
+      document
+        .getElementById("progressBox")
+        .style.display =
+        "none";
+
+      convertBtn.disabled =
+        false;
+
+      convertBtn.innerText =
+        "Convert to " +
+        format.toUpperCase();
+
+    }
+
+
+    /* THEMES */
+
+    function setTheme(theme) {
+
+      const themes = {
+
+        purple: {
+          accent: "#8b5cf6",
+          accent2: "#2563eb"
+        },
+
+        red: {
+          accent: "#ef4444",
+          accent2: "#f97316"
+        },
+
+        blue: {
+          accent: "#3b82f6",
+          accent2: "#06b6d4"
+        },
+
+        grey: {
+          accent: "#6b7280",
+          accent2: "#374151"
+        }
+
+      };
+
+
+      document
+        .documentElement
+        .style
+        .setProperty(
+          "--accent",
+          themes[theme].accent
+        );
+
+      document
+        .documentElement
+        .style
+        .setProperty(
+          "--accent2",
+          themes[theme].accent2
+        );
+
+      localStorage.setItem(
+        "theme",
+        theme
+      );
+
+    }
+
+
+    /* LOAD SAVED THEME */
+
+    const savedTheme =
+      localStorage.getItem("theme");
+
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+
+  </script>
+
+</body>
+          </html>
