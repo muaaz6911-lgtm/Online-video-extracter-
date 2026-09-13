@@ -1,0 +1,13 @@
+{
+  "name": "video-extractor-v4",
+  "version": "4.0.0",
+  "description": "Personal media converter",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "multer": "^1.4.5-lts.1"
+  }
+}
