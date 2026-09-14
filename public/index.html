@@ -1265,7 +1265,1034 @@ body.spider-theme
   }
 
 }
+/* =========================
+   HALLOWEEN DARK THEME
+========================= */
 
+.halloween-scene {
+
+  position: fixed;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  overflow: hidden;
+
+  z-index: -4;
+
+  opacity: 0;
+
+  transition:
+  opacity .8s ease;
+
+}
+
+
+body.dark-theme
+.halloween-scene {
+
+  opacity: 1;
+
+}
+
+
+/* =========================
+   DARK BACKGROUND
+========================= */
+
+body.dark-theme {
+
+  --accent: #a855f7;
+
+  --accent2: #5b21b6;
+
+  --accent-rgb:
+  168, 85, 247;
+
+  --bg:
+  #08040f;
+
+  background:
+
+  radial-gradient(
+    circle at 75% 15%,
+    rgba(130,70,255,.16),
+    transparent 28%
+  ),
+
+  radial-gradient(
+    circle at 20% 80%,
+    rgba(100,20,120,.12),
+    transparent 35%
+  ),
+
+  linear-gradient(
+    180deg,
+    #07030d,
+    #0d0615,
+    #050308
+  );
+
+}
+
+
+/* =========================
+   MOON
+========================= */
+
+.halloween-moon {
+
+  position: absolute;
+
+  width: 180px;
+
+  height: 180px;
+
+  top: 70px;
+
+  right: 10%;
+
+  border-radius: 50%;
+
+  background:
+
+  radial-gradient(
+    circle at 35% 30%,
+
+    #ffffff 0%,
+
+    #f1e9ff 35%,
+
+    #cbb8e8 70%,
+
+    #9b82c5 100%
+  );
+
+  box-shadow:
+
+  0 0 30px
+  rgba(220,190,255,.7),
+
+  0 0 80px
+  rgba(150,80,255,.35),
+
+  0 0 150px
+  rgba(100,30,180,.2);
+
+  animation:
+
+  moonGlow
+  5s
+  ease-in-out
+  infinite;
+
+}
+
+
+@keyframes moonGlow {
+
+  0%,
+  100% {
+
+    transform:
+    scale(1);
+
+    box-shadow:
+
+    0 0 30px
+    rgba(220,190,255,.7),
+
+    0 0 80px
+    rgba(150,80,255,.35);
+
+  }
+
+
+  50% {
+
+    transform:
+    scale(1.04);
+
+    box-shadow:
+
+    0 0 45px
+    rgba(230,210,255,.9),
+
+    0 0 110px
+    rgba(150,80,255,.5);
+
+  }
+
+}
+
+
+/* =========================
+   MOON CRATERS
+========================= */
+
+.moon-crater {
+
+  position: absolute;
+
+  border-radius: 50%;
+
+  background:
+  rgba(100,70,140,.18);
+
+}
+
+
+.crater1 {
+
+  width: 28px;
+
+  height: 18px;
+
+  top: 45px;
+
+  left: 45px;
+
+}
+
+
+.crater2 {
+
+  width: 18px;
+
+  height: 25px;
+
+  top: 95px;
+
+  right: 40px;
+
+}
+
+
+.crater3 {
+
+  width: 13px;
+
+  height: 13px;
+
+  bottom: 40px;
+
+  left: 70px;
+
+}
+
+
+/* =========================
+   STARS
+========================= */
+
+.halloween-stars {
+
+  position: absolute;
+
+  inset: 0;
+
+  background-image:
+
+  radial-gradient(
+    circle,
+    rgba(255,255,255,.8) 1px,
+    transparent 1.5px
+  ),
+
+  radial-gradient(
+    circle,
+    rgba(180,130,255,.7) 1px,
+    transparent 1.5px
+  );
+
+  background-size:
+
+  110px 110px,
+
+  170px 170px;
+
+  opacity: .4;
+
+  animation:
+
+  halloweenStars
+  20s
+  linear
+  infinite;
+
+}
+
+
+@keyframes halloweenStars {
+
+  from {
+
+    background-position:
+
+    0 0,
+
+    50px 40px;
+
+  }
+
+
+  to {
+
+    background-position:
+
+    110px 130px,
+
+    220px 200px;
+
+  }
+
+}
+
+
+/* =========================
+   FOG
+========================= */
+
+.halloween-fog {
+
+  position: absolute;
+
+  width: 180%;
+
+  height: 250px;
+
+  left: -40%;
+
+  bottom: -100px;
+
+  background:
+
+  radial-gradient(
+    ellipse,
+    rgba(130,90,160,.12),
+    transparent 65%
+  );
+
+  filter:
+  blur(35px);
+
+  animation:
+
+  fogMove
+  18s
+  ease-in-out
+  infinite;
+
+}
+
+
+.fog2 {
+
+  bottom: 20px;
+
+  opacity: .6;
+
+  animation-delay:
+  -8s;
+
+}
+
+
+@keyframes fogMove {
+
+  0%,
+  100% {
+
+    transform:
+    translateX(-5%);
+
+  }
+
+
+  50% {
+
+    transform:
+    translateX(8%);
+
+  }
+
+}
+
+
+/* =========================
+   WITCH
+========================= */
+
+.halloween-witch {
+
+  position: absolute;
+
+  top: 170px;
+
+  right: -200px;
+
+  font-size: 58px;
+
+  filter:
+
+  drop-shadow(
+    0 0 12px
+    rgba(130,60,255,.8)
+  );
+
+  animation:
+
+  witchFly
+  16s
+  linear
+  infinite;
+
+}
+
+
+@keyframes witchFly {
+
+  0% {
+
+    transform:
+
+    translateX(0)
+
+    translateY(0)
+
+    rotate(-5deg);
+
+  }
+
+
+  25% {
+
+    transform:
+
+    translateX(-35vw)
+
+    translateY(-25px)
+
+    rotate(4deg);
+
+  }
+
+
+  50% {
+
+    transform:
+
+    translateX(-70vw)
+
+    translateY(15px)
+
+    rotate(-3deg);
+
+  }
+
+
+  75% {
+
+    transform:
+
+    translateX(-105vw)
+
+    translateY(-15px)
+
+    rotate(5deg);
+
+  }
+
+
+  100% {
+
+    transform:
+
+    translateX(-140vw)
+
+    translateY(0)
+
+    rotate(-5deg);
+
+  }
+
+}
+
+
+/* =========================
+   BATS
+========================= */
+
+.halloween-bat {
+
+  position: absolute;
+
+  font-size: 28px;
+
+  color:
+  #1b1025;
+
+  text-shadow:
+
+  0 0 8px
+  rgba(120,50,180,.4);
+
+  animation:
+
+  batFly
+  7s
+  ease-in-out
+  infinite;
+
+}
+
+
+.bat1 {
+
+  top: 120px;
+
+  left: 10%;
+
+}
+
+
+.bat2 {
+
+  top: 260px;
+
+  left: 25%;
+
+  font-size: 20px;
+
+  animation-delay:
+  -2s;
+
+}
+
+
+.bat3 {
+
+  top: 180px;
+
+  left: 55%;
+
+  font-size: 24px;
+
+  animation-delay:
+  -4s;
+
+}
+
+
+.bat4 {
+
+  top: 350px;
+
+  left: 75%;
+
+  font-size: 18px;
+
+  animation-delay:
+  -1s;
+
+}
+
+
+@keyframes batFly {
+
+  0%,
+  100% {
+
+    transform:
+
+    translate(0,0)
+
+    rotate(-8deg);
+
+  }
+
+
+  25% {
+
+    transform:
+
+    translate(35px,-18px)
+
+    rotate(8deg);
+
+  }
+
+
+  50% {
+
+    transform:
+
+    translate(70px,8px)
+
+    rotate(-5deg);
+
+  }
+
+
+  75% {
+
+    transform:
+
+    translate(30px,25px)
+
+    rotate(7deg);
+
+  }
+
+}
+
+
+/* =========================
+   HAUNTED CASTLE
+========================= */
+
+.haunted-castle {
+
+  position: absolute;
+
+  bottom: -5px;
+
+  left: 50%;
+
+  transform:
+  translateX(-50%);
+
+  width: 450px;
+
+  height: 180px;
+
+  opacity: .65;
+
+}
+
+
+.castle-base {
+
+  position: absolute;
+
+  bottom: 0;
+
+  left: 50px;
+
+  width: 350px;
+
+  height: 100px;
+
+  background:
+
+  linear-gradient(
+    180deg,
+    #160c20,
+    #07040b
+  );
+
+  border-radius:
+  5px 5px 0 0;
+
+}
+
+
+.castle-tower {
+
+  position: absolute;
+
+  bottom: 0;
+
+  width: 70px;
+
+  background:
+  #0a0610;
+
+}
+
+
+.tower1 {
+
+  left: 40px;
+
+  height: 150px;
+
+}
+
+
+.tower2 {
+
+  right: 40px;
+
+  height: 170px;
+
+}
+
+
+.tower3 {
+
+  left: 185px;
+
+  height: 130px;
+
+}
+
+
+.castle-tower::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: -30px;
+
+  left: -8px;
+
+  width: 0;
+
+  height: 0;
+
+  border-left:
+  43px solid transparent;
+
+  border-right:
+  43px solid transparent;
+
+  border-bottom:
+  35px solid #0a0610;
+
+}
+
+
+.castle-window {
+
+  position: absolute;
+
+  width: 10px;
+
+  height: 18px;
+
+  background:
+  #c96cff;
+
+  box-shadow:
+
+  0 0 12px
+  rgba(180,80,255,.8);
+
+  border-radius:
+  8px 8px 2px 2px;
+
+}
+
+
+.window1 {
+
+  left: 65px;
+
+  bottom: 60px;
+
+}
+
+
+.window2 {
+
+  left: 245px;
+
+  bottom: 75px;
+
+}
+
+
+.window3 {
+
+  right: 70px;
+
+  bottom: 75px;
+
+}
+
+
+/* =========================
+   GRAVEYARD
+========================= */
+
+.graveyard {
+
+  position: absolute;
+
+  bottom: 0;
+
+  width: 100%;
+
+  height: 100px;
+
+}
+
+
+.grave {
+
+  position: absolute;
+
+  bottom: 0;
+
+  width: 42px;
+
+  height: 65px;
+
+  background:
+  #120d18;
+
+  border:
+
+  1px solid
+  rgba(150,100,180,.2);
+
+  border-radius:
+  20px 20px 3px 3px;
+
+}
+
+
+.grave::after {
+
+  content: "✝";
+
+  position: absolute;
+
+  top: 10px;
+
+  left: 12px;
+
+  color:
+  rgba(180,130,200,.45);
+
+  font-size: 18px;
+
+}
+
+
+.grave1 {
+
+  left: 8%;
+
+  transform:
+  rotate(-5deg);
+
+}
+
+
+.grave2 {
+
+  left: 20%;
+
+  height: 50px;
+
+  transform:
+  rotate(4deg);
+
+}
+
+
+.grave3 {
+
+  right: 18%;
+
+  height: 70px;
+
+  transform:
+  rotate(-4deg);
+
+}
+
+
+.grave4 {
+
+  right: 5%;
+
+  height: 52px;
+
+  transform:
+  rotate(5deg);
+
+}
+
+
+/* =========================
+   SKULL
+========================= */
+
+.halloween-skull {
+
+  position: fixed;
+
+  left: 25px;
+
+  bottom: 25px;
+
+  font-size: 52px;
+
+  opacity: 0;
+
+  z-index: -2;
+
+  pointer-events: none;
+
+  filter:
+
+  drop-shadow(
+    0 0 15px
+    rgba(150,70,255,.4)
+  );
+
+  transform:
+  rotate(-8deg);
+
+  transition:
+  opacity .7s ease;
+
+}
+
+
+body.dark-theme
+.halloween-skull {
+
+  opacity: .65;
+
+}
+
+
+/* =========================
+   COFFIN
+========================= */
+
+.halloween-coffin {
+
+  position: fixed;
+
+  right: 35px;
+
+  bottom: 30px;
+
+  width: 48px;
+
+  height: 85px;
+
+  background:
+
+  linear-gradient(
+    135deg,
+    #3a1724,
+    #12070d
+  );
+
+  border:
+
+  2px solid
+  #6d2d48;
+
+  clip-path:
+
+  polygon(
+    25% 0,
+    75% 0,
+    100% 20%,
+    100% 80%,
+    75% 100%,
+    25% 100%,
+    0 80%,
+    0 20%
+  );
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: -2;
+
+  transition:
+  opacity .7s ease;
+
+  box-shadow:
+
+  0 0 25px
+  rgba(130,30,80,.25);
+
+}
+
+
+.halloween-coffin::after {
+
+  content: "✝";
+
+  position: absolute;
+
+  top: 23px;
+
+  left: 13px;
+
+  font-size: 22px;
+
+  color:
+  #9b6378;
+
+}
+
+
+body.dark-theme
+.halloween-coffin {
+
+  opacity: .8;
+
+}
+
+
+/* =========================
+   DARK THEME BUTTON
+========================= */
+
+body.dark-theme
+.download-btn {
+
+  background:
+
+  linear-gradient(
+    120deg,
+
+    #2b0d42,
+
+    #7c2bbd,
+
+    #bd4b92,
+
+    #2b0d42
+  );
+
+  background-size:
+  300% 300%;
+
+}
+
+
+body.dark-theme
+.download-btn:hover {
+
+  box-shadow:
+
+  0
+  15px
+  45px
+
+  rgba(160,70,255,.4),
+
+  0
+  0
+  30px
+
+  rgba(220,70,150,.2);
+
+}
 
 /* =========================
    NAV
@@ -2651,7 +3678,108 @@ class="spider-container"
   </div>
 
 </div>
+   
+<!-- =====================
+     HALLOWEEN THEME
+===================== -->
 
+<div class="halloween-scene">
+
+  <!-- Stars -->
+  <div class="halloween-stars"></div>
+
+  <!-- Moon -->
+  <div class="halloween-moon">
+
+    <div class="moon-crater crater1"></div>
+
+    <div class="moon-crater crater2"></div>
+
+    <div class="moon-crater crater3"></div>
+
+  </div>
+
+
+  <!-- Witch -->
+  <div class="halloween-witch">
+    🧙‍♀️
+  </div>
+
+
+  <!-- Bats -->
+
+  <div class="halloween-bat bat1">
+    🦇
+  </div>
+
+  <div class="halloween-bat bat2">
+    🦇
+  </div>
+
+  <div class="halloween-bat bat3">
+    🦇
+  </div>
+
+  <div class="halloween-bat bat4">
+    🦇
+  </div>
+
+
+  <!-- Fog -->
+
+  <div class="halloween-fog"></div>
+
+  <div class="halloween-fog fog2"></div>
+
+
+  <!-- Haunted Castle -->
+
+  <div class="haunted-castle">
+
+    <div class="castle-base"></div>
+
+    <div class="castle-tower tower1"></div>
+
+    <div class="castle-tower tower2"></div>
+
+    <div class="castle-tower tower3"></div>
+
+    <div class="castle-window window1"></div>
+
+    <div class="castle-window window2"></div>
+
+    <div class="castle-window window3"></div>
+
+  </div>
+
+
+  <!-- Graveyard -->
+
+  <div class="graveyard">
+
+    <div class="grave grave1"></div>
+
+    <div class="grave grave2"></div>
+
+    <div class="grave grave3"></div>
+
+    <div class="grave grave4"></div>
+
+  </div>
+
+</div>
+
+
+<!-- Skull -->
+
+<div class="halloween-skull">
+  💀
+</div>
+
+
+<!-- Coffin -->
+
+<div class="halloween-coffin"></div>
 
 <!-- =====================
      MENU OVERLAY
@@ -3660,7 +4788,7 @@ function setColour(colour) {
    THEMES
 ====================== */
 
-function setTheme(theme) {
+   function setTheme(theme) {
 
   /* REMOVE ALL THEMES */
 
@@ -3710,7 +4838,7 @@ function setTheme(theme) {
   }
 
 
-  /* DARK */
+  /* DARK / HALLOWEEN */
 
   else if (theme === "dark") {
 
@@ -3729,11 +4857,9 @@ function setTheme(theme) {
       "--accent"
     );
 
-
     document.body.style.removeProperty(
       "--accent2"
     );
-
 
     document.body.style.removeProperty(
       "--accent-rgb"
@@ -3745,17 +4871,12 @@ function setTheme(theme) {
   /* SAVE THEME */
 
   localStorage.setItem(
-
     "websiteTheme",
-
     theme
-
   );
 
-
-  closeMenu();
-
 }
+
 
 
 /* ======================
