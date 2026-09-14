@@ -14,7 +14,8 @@ from flask import (
     Flask,
     request,
     jsonify,
-    send_file
+    send_file,
+    send_from_directory
 )
 
 from flask_cors import CORS
@@ -27,6 +28,26 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 CORS(app)
+
+
+# =========================================
+# FRONTEND WEBSITE
+# =========================================
+
+@app.route("/")
+def home():
+    return send_from_directory(
+        "public",
+        "index.html"
+    )
+
+
+@app.route("/<path:filename>")
+def frontend_files(filename):
+    return send_from_directory(
+        "public",
+        filename
+    )
 
 
 # =========================================
@@ -92,12 +113,13 @@ def validate_url(url):
 
     hostname = hostname.lower()
 
-    # Block localhost
     if (
         hostname == "localhost"
         or hostname.endswith(".localhost")
     ):
-        raise ValueError("This URL is not allowed.")
+        raise ValueError(
+            "This URL is not allowed."
+        )
 
     # Check direct IP
     try:
@@ -253,7 +275,7 @@ def download_direct_media(url, temp_dir):
 
     response.raise_for_status()
 
-    # Validate final redirect URL
+    # Validate final redirect
     validate_url(response.url)
 
     content_type = (
@@ -274,7 +296,6 @@ def download_direct_media(url, temp_dir):
 
     filename = safe_filename(filename)
 
-    # Add extension if missing
     if "." not in filename:
 
         if "video" in content_type:
@@ -346,7 +367,6 @@ def download_with_ytdlp(
             "postprocessors": [
 
                 {
-
                     "key":
                     "FFmpegExtractAudio",
 
@@ -355,7 +375,6 @@ def download_with_ytdlp(
 
                     "preferredquality":
                     "192"
-
                 }
 
             ]
@@ -393,7 +412,7 @@ def download_with_ytdlp(
 
 
 # =========================================
-# STATUS
+# API STATUS
 # =========================================
 
 @app.route(
@@ -414,7 +433,7 @@ def status():
 
 
 # =========================================
-# VIDEO DOWNLOAD
+# VIDEO DOWNLOAD API
 # =========================================
 
 @app.route(
@@ -434,20 +453,18 @@ def download_video():
             prefix="video-extractor-"
         )
 
+        media_file = None
+
 
         # TRY DIRECT MEDIA FIRST
-
-        media_file = None
 
         if is_direct_media_url(url):
 
             try:
 
-                media_file = (
-                    download_direct_media(
-                        url,
-                        temp_dir
-                    )
+                media_file = download_direct_media(
+                    url,
+                    temp_dir
                 )
 
             except Exception as error:
@@ -488,8 +505,6 @@ def download_video():
             )
 
 
-        # GET REAL FILENAME
-
         filename = os.path.basename(
             media_file
         )
@@ -510,11 +525,8 @@ def download_video():
         def cleanup():
 
             shutil.rmtree(
-
                 temp_dir,
-
                 ignore_errors=True
-
             )
 
 
@@ -546,7 +558,7 @@ def download_video():
 
 
 # =========================================
-# MP3 CONVERSION
+# MP3 CONVERSION API
 # =========================================
 
 @app.route(
@@ -579,11 +591,8 @@ def convert_mp3():
 
 
         mp3_file = find_file(
-
             temp_dir,
-
             ["mp3"]
-
         )
 
 
@@ -611,11 +620,8 @@ def convert_mp3():
         def cleanup():
 
             shutil.rmtree(
-
                 temp_dir,
-
                 ignore_errors=True
-
             )
 
 
@@ -666,4 +672,4 @@ if __name__ == "__main__":
 
         port=port
 
-  )   
+    )
