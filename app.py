@@ -36,6 +36,7 @@ CORS(app)
 
 @app.route("/")
 def home():
+
     return send_from_directory(
         "public",
         "index.html"
@@ -44,6 +45,7 @@ def home():
 
 @app.route("/<path:filename>")
 def frontend_files(filename):
+
     return send_from_directory(
         "public",
         filename
@@ -73,6 +75,7 @@ USER_AGENT = (
 def is_private_ip(ip):
 
     try:
+
         address = ipaddress.ip_address(ip)
 
         return (
@@ -84,6 +87,7 @@ def is_private_ip(ip):
         )
 
     except ValueError:
+
         return True
 
 
@@ -94,54 +98,89 @@ def is_private_ip(ip):
 def validate_url(url):
 
     if not url:
-        raise ValueError("Please enter a URL.")
+
+        raise ValueError(
+            "Please enter a URL."
+        )
+
 
     if len(url) > MAX_URL_LENGTH:
-        raise ValueError("URL is too long.")
+
+        raise ValueError(
+            "URL is too long."
+        )
+
 
     parsed = urlparse(url)
 
+
     if parsed.scheme not in ("http", "https"):
+
         raise ValueError(
             "Only HTTP and HTTPS URLs are allowed."
         )
 
+
     hostname = parsed.hostname
 
+
     if not hostname:
-        raise ValueError("Invalid URL.")
+
+        raise ValueError(
+            "Invalid URL."
+        )
+
 
     hostname = hostname.lower()
+
+
+    # Block localhost
 
     if (
         hostname == "localhost"
         or hostname.endswith(".localhost")
     ):
+
         raise ValueError(
             "This URL is not allowed."
         )
 
-    # Check direct IP
+
+    # =====================================
+    # CHECK DIRECT IP
+    # =====================================
+
     try:
 
         ipaddress.ip_address(hostname)
 
+
         if is_private_ip(hostname):
+
             raise ValueError(
                 "Private network URLs are not allowed."
             )
 
+
         return url
+
 
     except ValueError as error:
 
         if "Private network" in str(error):
+
             raise error
 
+
     except Exception:
+
         pass
 
-    # DNS lookup
+
+    # =====================================
+    # DNS LOOKUP
+    # =====================================
+
     try:
 
         addresses = socket.getaddrinfo(
@@ -149,27 +188,35 @@ def validate_url(url):
             None
         )
 
+
         ips = set(
             item[4][0]
             for item in addresses
         )
 
+
         if not ips:
+
             raise ValueError(
                 "Could not resolve this URL."
             )
 
+
         for ip in ips:
 
             if is_private_ip(ip):
+
                 raise ValueError(
                     "This URL is not allowed."
                 )
 
+
     except socket.gaierror:
+
         raise ValueError(
             "Could not resolve this URL."
         )
+
 
     return url
 
@@ -184,15 +231,19 @@ def get_request_url():
         silent=True
     )
 
+
     if not data:
+
         raise ValueError(
             "No data received."
         )
+
 
     url = data.get(
         "url",
         ""
     ).strip()
+
 
     return validate_url(url)
 
@@ -208,6 +259,7 @@ def safe_filename(name):
         "_",
         name
     )
+
 
     return name[:100]
 
@@ -225,10 +277,14 @@ def find_file(folder, extensions):
             f"*.{extension}"
         )
 
+
         files = glob.glob(pattern)
 
+
         if files:
+
             return files[0]
+
 
     return None
 
@@ -241,20 +297,27 @@ def is_direct_media_url(url):
 
     path = urlparse(url).path.lower()
 
+
     extensions = (
+
         ".mp4",
         ".webm",
         ".mkv",
         ".mov",
         ".avi",
+
         ".mp3",
         ".m4a",
         ".wav",
         ".ogg",
         ".aac"
+
     )
 
-    return path.endswith(extensions)
+
+    return path.endswith(
+        extensions
+    )
 
 
 # =========================================
@@ -264,19 +327,33 @@ def is_direct_media_url(url):
 def download_direct_media(url, temp_dir):
 
     response = requests.get(
+
         url,
+
         stream=True,
+
         timeout=REQUEST_TIMEOUT,
+
         allow_redirects=True,
+
         headers={
+
             "User-Agent": USER_AGENT
+
         }
+
     )
+
 
     response.raise_for_status()
 
-    # Validate final redirect
-    validate_url(response.url)
+
+    # Validate redirect URL
+
+    validate_url(
+        response.url
+    )
+
 
     content_type = (
         response.headers.get(
@@ -285,32 +362,51 @@ def download_direct_media(url, temp_dir):
         ).lower()
     )
 
-    parsed = urlparse(response.url)
+
+    parsed = urlparse(
+        response.url
+    )
+
 
     filename = os.path.basename(
         parsed.path
     )
 
+
     if not filename:
+
         filename = "media"
 
-    filename = safe_filename(filename)
+
+    filename = safe_filename(
+        filename
+    )
+
+
+    # Add extension if missing
 
     if "." not in filename:
 
         if "video" in content_type:
+
             filename += ".mp4"
 
+
         elif "audio" in content_type:
+
             filename += ".mp3"
 
+
         else:
+
             filename += ".media"
+
 
     file_path = os.path.join(
         temp_dir,
         filename
     )
+
 
     with open(
         file_path,
@@ -322,7 +418,11 @@ def download_direct_media(url, temp_dir):
         ):
 
             if chunk:
-                file.write(chunk)
+
+                file.write(
+                    chunk
+                )
+
 
     return file_path
 
@@ -342,22 +442,28 @@ def download_with_ytdlp(
         "media.%(ext)s"
     )
 
+
     options = {
 
         "outtmpl": output_template,
 
         "noplaylist": True,
 
-        "quiet": True,
+        "quiet": False,
 
-        "no_warnings": True,
+        "no_warnings": False,
 
-        "restrictfilenames": True
+        "restrictfilenames": True,
+
+        "ffmpeg_location": "/usr/bin"
 
     }
 
 
+    # =====================================
     # AUDIO / MP3
+    # =====================================
+
     if audio_only:
 
         options.update({
@@ -367,14 +473,13 @@ def download_with_ytdlp(
             "postprocessors": [
 
                 {
-                    "key":
-                    "FFmpegExtractAudio",
 
-                    "preferredcodec":
-                    "mp3",
+                    "key": "FFmpegExtractAudio",
 
-                    "preferredquality":
-                    "192"
+                    "preferredcodec": "mp3",
+
+                    "preferredquality": "192"
+
                 }
 
             ]
@@ -382,7 +487,10 @@ def download_with_ytdlp(
         })
 
 
-    # VIDEO
+    # =====================================
+    # VIDEO WITH AUDIO
+    # =====================================
+
     else:
 
         options.update({
@@ -393,8 +501,7 @@ def download_with_ytdlp(
                 "best[ext=mp4]/best"
             ),
 
-            "merge_output_format":
-            "mp4"
+            "merge_output_format": "mp4"
 
         })
 
@@ -407,6 +514,7 @@ def download_with_ytdlp(
             url,
             download=True
         )
+
 
     return info
 
@@ -445,18 +553,23 @@ def download_video():
 
     temp_dir = None
 
+
     try:
 
         url = get_request_url()
+
 
         temp_dir = tempfile.mkdtemp(
             prefix="video-extractor-"
         )
 
+
         media_file = None
 
 
-        # TRY DIRECT MEDIA FIRST
+        # =================================
+        # DIRECT MEDIA
+        # =================================
 
         if is_direct_media_url(url):
 
@@ -467,6 +580,7 @@ def download_video():
                     temp_dir
                 )
 
+
             except Exception as error:
 
                 print(
@@ -475,7 +589,9 @@ def download_video():
                 )
 
 
-        # USE YT-DLP
+        # =================================
+        # YT-DLP DOWNLOAD
+        # =================================
 
         if not media_file:
 
@@ -484,15 +600,19 @@ def download_video():
                 temp_dir
             )
 
+
             media_file = find_file(
 
                 temp_dir,
 
                 [
+
                     "mp4",
                     "webm",
                     "mkv",
-                    "mov"
+                    "mov",
+                    "avi"
+
                 ]
 
             )
@@ -570,14 +690,20 @@ def convert_mp3():
 
     temp_dir = None
 
+
     try:
 
         url = get_request_url()
+
 
         temp_dir = tempfile.mkdtemp(
             prefix="video-extractor-"
         )
 
+
+        # =================================
+        # DOWNLOAD + CONVERT
+        # =================================
 
         download_with_ytdlp(
 
@@ -622,54 +748,4 @@ def convert_mp3():
             shutil.rmtree(
                 temp_dir,
                 ignore_errors=True
-            )
-
-
-        return response
-
-
-    except Exception as error:
-
-        print(
-            "MP3 ERROR:",
-            str(error)
-        )
-
-
-        if temp_dir:
-
-            shutil.rmtree(
-                temp_dir,
-                ignore_errors=True
-            )
-
-
-        return jsonify({
-
-            "error":
-            "Unable to convert this public media URL."
-
-        }), 400
-
-
-# =========================================
-# RUN APP
-# =========================================
-
-if __name__ == "__main__":
-
-    port = int(
-        os.environ.get(
-            "PORT",
-            5000
-        )
-    )
-
-
-    app.run(
-
-        host="0.0.0.0",
-
-        port=port
-
-    )
+           
