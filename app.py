@@ -748,4 +748,46 @@ def convert_mp3():
             shutil.rmtree(
                 temp_dir,
                 ignore_errors=True
+                        return response
+
+
+    except Exception as error:
+
+        print(
+            "MP3 ERROR:",
+            str(error)
+        )
+
+        if temp_dir:
+
+            shutil.rmtree(
+                temp_dir,
+                ignore_errors=True
+            )
+
+        return jsonify({
+
+            "error":
+            "Unable to convert this public media URL."
+
+        }), 400
+
+
+# =========================================
+# RUN APP
+# =========================================
+
+if __name__ == "__main__":
+
+    port = int(
+        os.environ.get(
+            "PORT",
+            5000
+        )
+    )
+
+    app.run(
+        host="0.0.0.0",
+        port=port
+    )
            
