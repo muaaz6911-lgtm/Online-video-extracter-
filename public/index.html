@@ -4391,14 +4391,12 @@ function setFormat(format) {
 /* ======================
    DOWNLOAD
 ====================== */
-
 async function downloadMedia() {
 
-  const url =
-    document
-      .getElementById("urlInput")
-      .value
-      .trim();
+  const url = document
+    .getElementById("urlInput")
+    .value
+    .trim();
 
 
   if (!url) {
@@ -4448,16 +4446,12 @@ async function downloadMedia() {
 
     selectedFormat === "mp3"
 
-    ? "Converting media to MP3..."
+      ? "Converting media to MP3..."
 
-    : "Connecting to media server...";
+      : "Downloading media...";
 
 
   button.disabled = true;
-
-
-  button.style.opacity =
-    ".6";
 
 
   try {
@@ -4466,51 +4460,42 @@ async function downloadMedia() {
 
       selectedFormat === "mp3"
 
-      ? "/api/convert/mp3"
+        ? "/api/convert/mp3"
 
-      : "/api/download";
-
-
-    const response =
-      await fetch(
-
-        endpoint,
-
-        {
-
-          method: "POST",
+        : "/api/download";
 
 
-          headers: {
+    const response = await fetch(
 
-            "Content-Type":
-            "application/json"
+      endpoint,
 
-          },
+      {
 
+        method: "POST",
 
-          body:
+        headers: {
 
-          JSON.stringify({
+          "Content-Type":
+          "application/json"
 
-            url: url
+        },
 
-          })
+        body: JSON.stringify({
 
-        }
+          url: url
 
-      );
+        })
+
+      }
+
+    );
 
 
     if (!response.ok) {
 
-      const data =
-
-        await response
-          .json()
-          .catch(
-            () => null
-          );
+      const data = await response
+        .json()
+        .catch(() => null);
 
 
       throw new Error(
@@ -4525,12 +4510,7 @@ async function downloadMedia() {
 
 
     statusText.innerText =
-
-      selectedFormat === "mp3"
-
-      ? "Preparing MP3..."
-
-      : "Preparing file...";
+      "Preparing file...";
 
 
     const blob =
@@ -4538,11 +4518,15 @@ async function downloadMedia() {
 
 
     const objectURL =
-      URL.createObjectURL(blob);
+      URL.createObjectURL(
+        blob
+      );
 
 
     const link =
-      document.createElement("a");
+      document.createElement(
+        "a"
+      );
 
 
     link.href =
@@ -4553,9 +4537,9 @@ async function downloadMedia() {
 
       selectedFormat === "mp3"
 
-      ? "audio.mp3"
+        ? "audio.mp3"
 
-      : "media.mp4";
+        : "media.mp4";
 
 
     document.body.appendChild(
@@ -4582,16 +4566,17 @@ async function downloadMedia() {
 
       selectedFormat === "mp3"
 
-      ? "MP3 download started! ✓"
+        ? "MP3 download started! ✓"
 
-      : "Download started! ✓";
-
-  }
+        : "Download started! ✓";
 
 
-  catch (error) {
+  } catch (error) {
 
-    console.error(error);
+
+    console.error(
+      error
+    );
 
 
     loader.style.display =
@@ -4603,10 +4588,9 @@ async function downloadMedia() {
       "Error: " +
       error.message;
 
-  }
 
+  } finally {
 
-  finally {
 
     button.disabled =
       false;
@@ -4615,9 +4599,11 @@ async function downloadMedia() {
     button.style.opacity =
       "1";
 
+
   }
 
-}
+   }
+        
 
 
 /* ======================
