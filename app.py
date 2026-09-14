@@ -1,8 +1,9 @@
-import os
+ import os
 import glob
 import tempfile
 
 import yt_dlp
+import imageio_ffmpeg
 
 from flask import (
     Flask,
@@ -22,6 +23,20 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 CORS(app)
+
+
+# =========================
+# FFMPEG + COOKIES
+# =========================
+
+# Bundled ffmpeg binary (no system install needed on Render).
+# THIS WAS MISSING BEFORE — without it, yt-dlp can't merge
+# separate video + audio streams, so the final file only had video.
+FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
+
+# Netscape-format cookies.txt exported from your browser.
+# Upload this as a Render "Secret File" (do NOT commit to git).
+COOKIES_FILE = os.environ.get("COOKIES_FILE", "cookies.txt")
 
 
 # =========================
@@ -94,9 +109,21 @@ def download_media(
 
         "quiet": False,
 
-        "no_warnings": False
+        "no_warnings": False,
+
+        # FIX: tell yt-dlp where ffmpeg is, so it can actually
+        # merge the separate video-only and audio-only streams
+        # into one file with sound.
+        "ffmpeg_location": FFMPEG_PATH
 
     }
+
+
+    # Use cookies if a cookies.txt file has been uploaded
+    # (fixes "Sign in to confirm you're not a bot" on YouTube).
+    if os.path.exists(COOKIES_FILE):
+
+        options["cookiefile"] = COOKIES_FILE
 
 
     # =====================
@@ -134,11 +161,10 @@ def download_media(
 
         options.update({
 
-            "format": (
-                "bestvideo[ext=mp4]"
-                "+bestaudio/"
-                "best[ext=mp4]/best"
-            ),
+            # FIX: "bv*+ba/b" is more reliable than restricting to
+            # ext=mp4 — the old format string sometimes fell back
+            # to a video-only stream on sites like Instagram.
+            "format": "bv*+ba/b",
 
             "merge_output_format": "mp4"
 
@@ -439,3 +465,4 @@ if __name__ == "__main__":
         port=port
 
     )
+    
