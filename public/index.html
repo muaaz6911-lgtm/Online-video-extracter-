@@ -4393,10 +4393,11 @@ function setFormat(format) {
 ====================== */
 async function downloadMedia() {
 
-  const url = document
-    .getElementById("urlInput")
-    .value
-    .trim();
+  const url =
+    document
+      .getElementById("urlInput")
+      .value
+      .trim();
 
 
   if (!url) {
@@ -4446,56 +4447,82 @@ async function downloadMedia() {
 
     selectedFormat === "mp3"
 
-      ? "Converting media to MP3..."
+    ? "Converting media to MP3..."
 
-      : "Downloading media...";
+    : "Connecting to media server...";
 
 
   button.disabled = true;
 
 
+  button.style.opacity =
+    ".6";
+
+
   try {
+
+    /* BACKEND URL */
+
+    const backendURL =
+      "https://online-video-extracter-m0h8.onrender.com";
+
+
+    /* SELECT API */
 
     const endpoint =
 
       selectedFormat === "mp3"
 
-        ? "/api/convert/mp3"
+      ? backendURL +
+        "/api/convert/mp3"
 
-        : "/api/download";
+      : backendURL +
+        "/api/download";
 
 
-    const response = await fetch(
+    /* SEND REQUEST */
 
-      endpoint,
+    const response =
+      await fetch(
 
-      {
+        endpoint,
 
-        method: "POST",
+        {
 
-        headers: {
+          method: "POST",
 
-          "Content-Type":
-          "application/json"
 
-        },
+          headers: {
 
-        body: JSON.stringify({
+            "Content-Type":
+            "application/json"
 
-          url: url
+          },
 
-        })
 
-      }
+          body:
 
-    );
+          JSON.stringify({
 
+            url: url
+
+          })
+
+        }
+
+      );
+
+
+    /* ERROR CHECK */
 
     if (!response.ok) {
 
-      const data = await response
-        .json()
-        .catch(() => null);
+      const data =
+        await response
+          .json()
+          .catch(
+            () => null
+          );
 
 
       throw new Error(
@@ -4510,36 +4537,41 @@ async function downloadMedia() {
 
 
     statusText.innerText =
-      "Preparing file...";
 
+      selectedFormat === "mp3"
+
+      ? "Preparing MP3..."
+
+      : "Preparing file...";
+
+
+    /* GET FILE */
 
     const blob =
       await response.blob();
 
 
     const objectURL =
-      URL.createObjectURL(
-        blob
-      );
+      URL.createObjectURL(blob);
 
 
     const link =
-      document.createElement(
-        "a"
-      );
+      document.createElement("a");
 
 
     link.href =
       objectURL;
 
 
+    /* FILE NAME */
+
     link.download =
 
       selectedFormat === "mp3"
 
-        ? "audio.mp3"
+      ? "audio.mp3"
 
-        : "media.mp4";
+      : "media.mp4";
 
 
     document.body.appendChild(
@@ -4566,17 +4598,16 @@ async function downloadMedia() {
 
       selectedFormat === "mp3"
 
-        ? "MP3 download started! ✓"
+      ? "MP3 download started! ✓"
 
-        : "Download started! ✓";
+      : "Download started! ✓";
+
+  }
 
 
-  } catch (error) {
+  catch (error) {
 
-
-    console.error(
-      error
-    );
+    console.error(error);
 
 
     loader.style.display =
@@ -4588,9 +4619,10 @@ async function downloadMedia() {
       "Error: " +
       error.message;
 
+  }
 
-  } finally {
 
+  finally {
 
     button.disabled =
       false;
@@ -4599,13 +4631,11 @@ async function downloadMedia() {
     button.style.opacity =
       "1";
 
-
   }
 
-   }
-        
-
-
+}
+  
+    
 /* ======================
    COLOURS
 ====================== */
