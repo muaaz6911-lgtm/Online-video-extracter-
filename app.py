@@ -1,4 +1,4 @@
-  import os
+import os
 import re
 import glob
 import shutil
@@ -34,7 +34,6 @@ CORS(app)
 # =========================================
 
 MAX_URL_LENGTH = 2000
-
 REQUEST_TIMEOUT = 30
 
 USER_AGENT = (
@@ -53,33 +52,17 @@ USER_AGENT = (
 def is_private_ip(ip):
 
     try:
-
         address = ipaddress.ip_address(ip)
 
         return (
-
             address.is_private
-
-            or
-
-            address.is_loopback
-
-            or
-
-            address.is_link_local
-
-            or
-
-            address.is_reserved
-
-            or
-
-            address.is_multicast
-
+            or address.is_loopback
+            or address.is_link_local
+            or address.is_reserved
+            or address.is_multicast
         )
 
     except ValueError:
-
         return True
 
 
@@ -90,164 +73,81 @@ def is_private_ip(ip):
 def validate_url(url):
 
     if not url:
-
-        raise ValueError(
-            "Please enter a URL."
-        )
-
+        raise ValueError("Please enter a URL.")
 
     if len(url) > MAX_URL_LENGTH:
+        raise ValueError("URL is too long.")
 
-        raise ValueError(
-            "URL is too long."
-        )
+    parsed = urlparse(url)
 
-
-    try:
-
-        parsed = urlparse(url)
-
-    except Exception:
-
-        raise ValueError(
-            "Please enter a valid URL."
-        )
-
-
-    if parsed.scheme not in (
-
-        "http",
-
-        "https"
-
-    ):
-
+    if parsed.scheme not in ("http", "https"):
         raise ValueError(
             "Only HTTP and HTTPS URLs are allowed."
         )
 
-
     hostname = parsed.hostname
 
-
     if not hostname:
-
-        raise ValueError(
-            "Invalid URL."
-        )
-
+        raise ValueError("Invalid URL.")
 
     hostname = hostname.lower()
 
-
     # Block localhost
-
     if (
-
         hostname == "localhost"
-
-        or
-
-        hostname.endswith(
-            ".localhost"
-        )
-
+        or hostname.endswith(".localhost")
     ):
+        raise ValueError("This URL is not allowed.")
 
-        raise ValueError(
-            "This URL is not allowed."
-        )
-
-
-    # =====================================
-    # CHECK IP DIRECTLY
-    # =====================================
-
+    # Check direct IP
     try:
 
-        ipaddress.ip_address(
-            hostname
-        )
+        ipaddress.ip_address(hostname)
 
-
-        if is_private_ip(
-            hostname
-        ):
-
+        if is_private_ip(hostname):
             raise ValueError(
                 "Private network URLs are not allowed."
             )
 
-
         return url
-
 
     except ValueError as error:
 
-        # Real validation error
-
-        if (
-
-            "Private network"
-
-            in str(error)
-
-        ):
-
+        if "Private network" in str(error):
             raise error
 
-
     except Exception:
-
         pass
 
-
-    # =====================================
-    # DNS CHECK
-    # =====================================
-
+    # DNS lookup
     try:
 
         addresses = socket.getaddrinfo(
-
             hostname,
-
             None
-
         )
-
 
         ips = set(
-
             item[4][0]
-
             for item in addresses
-
         )
 
-
         if not ips:
-
             raise ValueError(
                 "Could not resolve this URL."
             )
 
-
         for ip in ips:
 
             if is_private_ip(ip):
-
                 raise ValueError(
                     "This URL is not allowed."
                 )
 
-
     except socket.gaierror:
-
         raise ValueError(
             "Could not resolve this URL."
         )
-
 
     return url
 
@@ -262,26 +162,17 @@ def get_request_url():
         silent=True
     )
 
-
     if not data:
-
         raise ValueError(
             "No data received."
         )
 
-
     url = data.get(
-
         "url",
-
         ""
-
     ).strip()
 
-
-    return validate_url(
-        url
-    )
+    return validate_url(url)
 
 
 # =========================================
@@ -291,15 +182,10 @@ def get_request_url():
 def safe_filename(name):
 
     name = re.sub(
-
         r'[^a-zA-Z0-9._-]',
-
         "_",
-
         name
-
     )
-
 
     return name[:100]
 
@@ -308,205 +194,114 @@ def safe_filename(name):
 # FIND FILE
 # =========================================
 
-def find_file(
-
-    folder,
-
-    extensions
-
-):
+def find_file(folder, extensions):
 
     for extension in extensions:
 
         pattern = os.path.join(
-
             folder,
-
             f"*.{extension}"
-
         )
 
-
-        files = glob.glob(
-            pattern
-        )
-
+        files = glob.glob(pattern)
 
         if files:
-
             return files[0]
-
 
     return None
 
 
 # =========================================
-# CHECK IF DIRECT MEDIA URL
+# CHECK DIRECT MEDIA URL
 # =========================================
 
 def is_direct_media_url(url):
 
-    path = urlparse(
-        url
-    ).path.lower()
-
+    path = urlparse(url).path.lower()
 
     extensions = (
-
         ".mp4",
-
         ".webm",
-
         ".mkv",
-
         ".mov",
-
         ".avi",
-
         ".mp3",
-
         ".m4a",
-
         ".wav",
-
         ".ogg",
-
         ".aac"
-
     )
 
-
-    return path.endswith(
-        extensions
-    )
+    return path.endswith(extensions)
 
 
 # =========================================
 # DIRECT MEDIA DOWNLOAD
 # =========================================
 
-def download_direct_media(
-
-    url,
-
-    temp_dir
-
-):
+def download_direct_media(url, temp_dir):
 
     response = requests.get(
-
         url,
-
         stream=True,
-
         timeout=REQUEST_TIMEOUT,
-
         allow_redirects=True,
-
         headers={
-
-            "User-Agent":
-
-            USER_AGENT
-
+            "User-Agent": USER_AGENT
         }
-
     )
-
 
     response.raise_for_status()
 
-
     # Validate final redirect URL
-
-    validate_url(
-        response.url
-    )
-
+    validate_url(response.url)
 
     content_type = (
-
         response.headers.get(
-
             "content-type",
-
             ""
-
-        )
-
-        .lower()
-
+        ).lower()
     )
 
-
-    # Filename
-
-    parsed = urlparse(
-        response.url
-    )
-
+    parsed = urlparse(response.url)
 
     filename = os.path.basename(
         parsed.path
     )
 
-
     if not filename:
-
         filename = "media"
 
-
-    filename = safe_filename(
-        filename
-    )
-
+    filename = safe_filename(filename)
 
     # Add extension if missing
-
     if "." not in filename:
 
         if "video" in content_type:
-
             filename += ".mp4"
 
         elif "audio" in content_type:
-
             filename += ".mp3"
 
         else:
-
             filename += ".media"
 
-
     file_path = os.path.join(
-
         temp_dir,
-
         filename
-
     )
 
-
     with open(
-
         file_path,
-
         "wb"
-
     ) as file:
 
         for chunk in response.iter_content(
-
             chunk_size=8192
-
         ):
 
             if chunk:
-
-                file.write(
-                    chunk
-                )
-
+                file.write(chunk)
 
     return file_path
 
@@ -516,85 +311,49 @@ def download_direct_media(
 # =========================================
 
 def download_with_ytdlp(
-
     url,
-
     temp_dir,
-
     audio_only=False
-
 ):
 
     output_template = os.path.join(
-
         temp_dir,
-
         "media.%(ext)s"
-
     )
-
 
     options = {
 
-        "outtmpl":
+        "outtmpl": output_template,
 
-        output_template,
+        "noplaylist": True,
 
+        "quiet": True,
 
-        "noplaylist":
+        "no_warnings": True,
 
-        True,
-
-
-        "quiet":
-
-        True,
-
-
-        "no_warnings":
-
-        True,
-
-
-        "restrictfilenames":
-
-        True
-
+        "restrictfilenames": True
 
     }
 
 
-    # =====================================
     # AUDIO / MP3
-    # =====================================
-
     if audio_only:
 
         options.update({
 
-            "format":
+            "format": "bestaudio/best",
 
-            "bestaudio/best",
-
-
-            "postprocessors":
-
-            [
+            "postprocessors": [
 
                 {
 
                     "key":
-
                     "FFmpegExtractAudio",
 
-
                     "preferredcodec":
-
                     "mp3",
 
-
                     "preferredquality":
-
                     "192"
 
                 }
@@ -604,45 +363,31 @@ def download_with_ytdlp(
         })
 
 
-    # =====================================
     # VIDEO
-    # =====================================
-
     else:
 
         options.update({
 
-            "format":
-
-            (
+            "format": (
                 "bestvideo[ext=mp4]"
                 "+bestaudio/"
                 "best[ext=mp4]/best"
             ),
 
-
             "merge_output_format":
-
             "mp4"
 
         })
 
 
     with yt_dlp.YoutubeDL(
-
         options
-
     ) as ydl:
 
-
         info = ydl.extract_info(
-
             url,
-
             download=True
-
         )
-
 
     return info
 
@@ -652,125 +397,85 @@ def download_with_ytdlp(
 # =========================================
 
 @app.route(
-
     "/api/status",
-
     methods=["GET"]
-
 )
 
 def status():
 
     return jsonify({
 
-        "status":
-
-        "online",
-
+        "status": "online",
 
         "service":
-
         "Video Extractor API"
 
     })
 
 
 # =========================================
-# MP4 DOWNLOAD
+# VIDEO DOWNLOAD
 # =========================================
 
 @app.route(
-
     "/api/download",
-
     methods=["POST"]
-
 )
 
 def download_video():
 
     temp_dir = None
 
-
     try:
 
         url = get_request_url()
 
-
         temp_dir = tempfile.mkdtemp(
-
             prefix="video-extractor-"
-
         )
 
 
-        # =================================
         # TRY DIRECT MEDIA FIRST
-        # =================================
 
         media_file = None
 
-
-        if is_direct_media_url(
-
-            url
-
-        ):
+        if is_direct_media_url(url):
 
             try:
 
                 media_file = (
-
                     download_direct_media(
-
                         url,
-
                         temp_dir
-
                     )
-
                 )
 
             except Exception as error:
 
                 print(
-
                     "Direct download failed:",
-
                     error
-
                 )
 
 
-        # =================================
-        # YT-DLP
-        # =================================
+        # USE YT-DLP
 
         if not media_file:
 
             download_with_ytdlp(
-
                 url,
-
                 temp_dir
-
             )
-
 
             media_file = find_file(
 
                 temp_dir,
 
                 [
-
                     "mp4",
-
                     "webm",
-
                     "mkv",
-
                     "mov"
-
                 ]
 
             )
@@ -779,10 +484,15 @@ def download_video():
         if not media_file:
 
             raise Exception(
-
                 "Could not find downloaded media."
-
             )
+
+
+        # GET REAL FILENAME
+
+        filename = os.path.basename(
+            media_file
+        )
 
 
         response = send_file(
@@ -791,9 +501,7 @@ def download_video():
 
             as_attachment=True,
 
-            download_name=
-
-            "media.mp4"
+            download_name=filename
 
         )
 
@@ -816,29 +524,22 @@ def download_video():
     except Exception as error:
 
         print(
-
             "DOWNLOAD ERROR:",
-
             str(error)
-
         )
 
 
         if temp_dir:
 
             shutil.rmtree(
-
                 temp_dir,
-
                 ignore_errors=True
-
             )
 
 
         return jsonify({
 
             "error":
-
             "Unable to download this public media URL."
 
         }), 400
@@ -849,33 +550,22 @@ def download_video():
 # =========================================
 
 @app.route(
-
     "/api/convert/mp3",
-
     methods=["POST"]
-
 )
 
 def convert_mp3():
 
     temp_dir = None
 
-
     try:
 
         url = get_request_url()
 
-
         temp_dir = tempfile.mkdtemp(
-
             prefix="video-extractor-"
-
         )
 
-
-        # =================================
-        # DOWNLOAD + CONVERT
-        # =================================
 
         download_with_ytdlp(
 
@@ -892,11 +582,7 @@ def convert_mp3():
 
             temp_dir,
 
-            [
-
-                "mp3"
-
-            ]
+            ["mp3"]
 
         )
 
@@ -904,9 +590,7 @@ def convert_mp3():
         if not mp3_file:
 
             raise Exception(
-
                 "MP3 conversion failed."
-
             )
 
 
@@ -916,14 +600,9 @@ def convert_mp3():
 
             as_attachment=True,
 
-            download_name=
+            download_name="audio.mp3",
 
-            "audio.mp3",
-
-
-            mimetype=
-
-            "audio/mpeg"
+            mimetype="audio/mpeg"
 
         )
 
@@ -946,29 +625,22 @@ def convert_mp3():
     except Exception as error:
 
         print(
-
             "MP3 ERROR:",
-
             str(error)
-
         )
 
 
         if temp_dir:
 
             shutil.rmtree(
-
                 temp_dir,
-
                 ignore_errors=True
-
             )
 
 
         return jsonify({
 
             "error":
-
             "Unable to convert this public media URL."
 
         }), 400
@@ -981,27 +653,17 @@ def convert_mp3():
 if __name__ == "__main__":
 
     port = int(
-
         os.environ.get(
-
             "PORT",
-
             5000
-
         )
-
     )
 
 
     app.run(
 
-        host=
+        host="0.0.0.0",
 
-        "0.0.0.0",
+        port=port
 
-
-        port=
-
-        port
-
-                )                  
+  )   
