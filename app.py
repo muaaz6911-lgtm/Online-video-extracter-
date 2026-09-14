@@ -1,15 +1,26 @@
 import os
 import glob
-import shutil
 import tempfile
 
 import yt_dlp
 
-from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    send_file,
+    send_from_directory
+)
+
 from flask_cors import CORS
 
 
+# =========================
+# APP
+# =========================
+
 app = Flask(__name__)
+
 CORS(app)
 
 
@@ -19,12 +30,20 @@ CORS(app)
 
 @app.route("/")
 def home():
-    return send_from_directory("public", "index.html")
+
+    return send_from_directory(
+        "public",
+        "index.html"
+    )
 
 
 @app.route("/<path:filename>")
 def frontend_files(filename):
-    return send_from_directory("public", filename)
+
+    return send_from_directory(
+        "public",
+        filename
+    )
 
 
 # =========================
@@ -32,12 +51,18 @@ def frontend_files(filename):
 # =========================
 
 def find_file(folder, extensions):
+
     for ext in extensions:
+
         files = glob.glob(
-            os.path.join(folder, f"*.{ext}")
+            os.path.join(
+                folder,
+                f"*.{ext}"
+            )
         )
 
         if files:
+
             return files[0]
 
     return None
@@ -47,39 +72,83 @@ def find_file(folder, extensions):
 # DOWNLOAD WITH YT-DLP
 # =========================
 
-def download_media(url, temp_dir, audio_only=False):
+def download_media(
+    url,
+    temp_dir,
+    audio_only=False
+):
 
     output_template = os.path.join(
         temp_dir,
         "media.%(ext)s"
     )
 
+
     options = {
+
         "outtmpl": output_template,
+
         "noplaylist": True,
+
         "restrictfilenames": True,
+
         "quiet": False,
-        "no_warnings": False,
+
+        "no_warnings": False
+
     }
+
+
+    # =====================
+    # MP3 DOWNLOAD
+    # =====================
 
     if audio_only:
 
         options.update({
+
             "format": "bestaudio/best",
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }]
+
+            "postprocessors": [
+
+                {
+
+                    "key": "FFmpegExtractAudio",
+
+                    "preferredcodec": "mp3",
+
+                    "preferredquality": "192"
+
+                }
+
+            ]
+
         })
+
+
+    # =====================
+    # VIDEO + AUDIO
+    # =====================
 
     else:
 
         options.update({
-            "format": "best[ext=mp4]/best"
+
+            "format": (
+                "bestvideo[ext=mp4]"
+                "+bestaudio/"
+                "best[ext=mp4]/best"
+            ),
+
+            "merge_output_format": "mp4"
+
         })
 
-    with yt_dlp.YoutubeDL(options) as ydl:
+
+    with yt_dlp.YoutubeDL(
+        options
+    ) as ydl:
+
         ydl.extract_info(
             url,
             download=True
@@ -87,153 +156,270 @@ def download_media(url, temp_dir, audio_only=False):
 
 
 # =========================
-# STATUS
+# API STATUS
 # =========================
 
-@app.route("/api/status")
+@app.route(
+    "/api/status",
+    methods=["GET"]
+)
+
 def status():
 
     return jsonify({
-        "status": "online"
+
+        "status": "online",
+
+        "service": "Video Extractor API"
+
     })
 
 
 # =========================
-# VIDEO DOWNLOAD
+# VIDEO DOWNLOAD API
 # =========================
 
 @app.route(
     "/api/download",
     methods=["POST"]
 )
+
 def download_video():
 
     temp_dir = None
 
+
     try:
 
-        data = request.get_json()
+        data = request.get_json(
+            silent=True
+        )
+
+
+        if not data:
+
+            return jsonify({
+
+                "error": "No data received."
+
+            }), 400
+
 
         url = data.get(
             "url",
             ""
         ).strip()
 
+
         if not url:
+
             return jsonify({
+
                 "error": "Please enter a URL."
+
             }), 400
 
 
-        temp_dir = tempfile.mkdtemp()
+        # Create temporary folder
+
+        temp_dir = tempfile.mkdtemp(
+            prefix="video-"
+        )
+
+
+        # Download video + audio
 
         download_media(
+
             url,
+
             temp_dir,
+
             audio_only=False
+
         )
+
+
+        # Find downloaded video
 
         media_file = find_file(
+
             temp_dir,
+
             [
+
                 "mp4",
+
                 "webm",
+
                 "mkv",
+
                 "mov"
+
             ]
+
         )
 
+
         if not media_file:
+
             raise Exception(
                 "Video file not found."
             )
 
 
-        return send_file(
+        # Send video
+
+        response = send_file(
+
             media_file,
+
             as_attachment=True,
-            download_name="video.mp4"
+
+            download_name="video.mp4",
+
+            mimetype="video/mp4"
+
         )
+
+
+        return response
 
 
     except Exception as error:
 
         print(
             "DOWNLOAD ERROR:",
-            error
+            str(error)
         )
 
+
         return jsonify({
+
             "error": str(error)
+
         }), 400
 
 
 # =========================
-# MP3 DOWNLOAD
+# MP3 CONVERSION API
 # =========================
 
 @app.route(
     "/api/convert/mp3",
     methods=["POST"]
 )
+
 def convert_mp3():
 
     try:
 
-        data = request.get_json()
+        data = request.get_json(
+            silent=True
+        )
+
+
+        if not data:
+
+            return jsonify({
+
+                "error": "No data received."
+
+            }), 400
+
 
         url = data.get(
             "url",
             ""
         ).strip()
 
+
         if not url:
+
             return jsonify({
+
                 "error": "Please enter a URL."
+
             }), 400
 
 
-        temp_dir = tempfile.mkdtemp()
+        # Create temporary folder
+
+        temp_dir = tempfile.mkdtemp(
+            prefix="audio-"
+        )
+
+
+        # Download and convert
 
         download_media(
+
             url,
+
             temp_dir,
+
             audio_only=True
+
         )
+
+
+        # Find MP3 file
 
         mp3_file = find_file(
+
             temp_dir,
-            ["mp3"]
+
+            [
+
+                "mp3"
+
+            ]
+
         )
 
+
         if not mp3_file:
+
             raise Exception(
                 "MP3 file not found."
             )
 
 
-        return send_file(
+        # Send MP3
+
+        response = send_file(
+
             mp3_file,
+
             as_attachment=True,
+
             download_name="audio.mp3",
+
             mimetype="audio/mpeg"
+
         )
+
+
+        return response
 
 
     except Exception as error:
 
         print(
             "MP3 ERROR:",
-            error
+            str(error)
         )
 
+
         return jsonify({
+
             "error": str(error)
+
         }), 400
 
 
 # =========================
-# RUN
+# RUN APP
 # =========================
 
 if __name__ == "__main__":
@@ -245,7 +431,11 @@ if __name__ == "__main__":
         )
     )
 
+
     app.run(
+
         host="0.0.0.0",
+
         port=port
+
     )
