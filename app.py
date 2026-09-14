@@ -1,9 +1,10 @@
 import os
 import glob
+import subprocess
 import tempfile
 
 import yt_dlp
-import imageio_ffmpeg
+import static_ffmpeg
 
 from flask import (
     Flask,
@@ -29,10 +30,14 @@ CORS(app)
 # FFMPEG + COOKIES
 # =========================
 
-# Bundled ffmpeg binary (no system install needed on Render).
-# THIS WAS MISSING BEFORE — without it, yt-dlp can't merge
-# separate video + audio streams, so the final file only had video.
-FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
+# static_ffmpeg downloads/caches BOTH ffmpeg and ffprobe binaries
+# and returns their paths. imageio-ffmpeg only gave us ffmpeg,
+# which is why "unable to obtain file audio codec with ffprobe"
+# was happening during MP3 conversion.
+FFMPEG_EXE, FFPROBE_EXE = static_ffmpeg.run.get_or_fetch_platform_executables_else_raise()
+
+# yt-dlp accepts a directory containing both ffmpeg + ffprobe here.
+FFMPEG_PATH = os.path.dirname(FFMPEG_EXE)
 
 # Netscape-format cookies.txt exported from your browser.
 # Upload this as a Render "Secret File" (do NOT commit to git).
@@ -81,6 +86,50 @@ def find_file(folder, extensions):
             return files[0]
 
     return None
+
+
+# =========================
+# FIX AUDIO COMPATIBILITY
+# =========================
+# yt-dlp's merger copies streams as-is ("-c copy"). If the source
+# audio codec (e.g. Opus, from a webm audio track) isn't natively
+# supported by MP4 on the viewer's device/player, the video plays
+# with NO SOUND even though an audio track technically exists.
+# This re-encodes just the audio to AAC (universally compatible),
+# keeping the video stream untouched (fast, no quality loss).
+
+def fix_audio_compatibility(input_path):
+
+    output_path = input_path.replace(
+        ".mp4",
+        "_fixed.mp4"
+    )
+
+    result = subprocess.run(
+        [
+            FFMPEG_EXE,
+            "-y",
+            "-i", input_path,
+            "-c:v", "copy",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-movflags", "+faststart",
+            output_path
+        ],
+        capture_output=True,
+        timeout=180
+    )
+
+    if result.returncode != 0 or not os.path.exists(output_path):
+        # if the fix step fails for some reason, fall back to the
+        # original file rather than breaking the whole download
+        print(
+            "AUDIO FIX FAILED:",
+            result.stderr.decode(errors="ignore")[-400:]
+        )
+        return input_path
+
+    return output_path
 
 
 # =========================
@@ -291,6 +340,15 @@ def download_video():
 
             raise Exception(
                 "Video file not found."
+            )
+
+
+        # Fix audio codec compatibility (this is what was
+        # causing "video plays, but no sound")
+        if media_file.endswith(".mp4"):
+
+            media_file = fix_audio_compatibility(
+                media_file
             )
 
 
