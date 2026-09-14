@@ -2,9 +2,9 @@ import os
 import glob
 import subprocess
 import tempfile
+import shutil
 
 import yt_dlp
-import static_ffmpeg
 
 from flask import (
     Flask,
@@ -17,103 +17,85 @@ from flask import (
 from flask_cors import CORS
 
 
-# =========================
-# APP
-# =========================
-
 app = Flask(__name__)
-
 CORS(app)
 
 
-# =========================
-# FFMPEG + COOKIES
-# =========================
+# =========================================================
+# FFMPEG / FFPROBE
+# =========================================================
 
-# static_ffmpeg downloads/caches BOTH ffmpeg and ffprobe binaries
-# and returns their paths. imageio-ffmpeg only gave us ffmpeg,
-# which is why "unable to obtain file audio codec with ffprobe"
-# was happening during MP3 conversion.
-FFMPEG_EXE, FFPROBE_EXE = static_ffmpeg.run.get_or_fetch_platform_executables_else_raise()
-
-# yt-dlp accepts a directory containing both ffmpeg + ffprobe here.
+FFMPEG_EXE = shutil.which("ffmpeg") or "/usr/bin/ffmpeg"
+FFPROBE_EXE = shutil.which("ffprobe") or "/usr/bin/ffprobe"
 FFMPEG_PATH = os.path.dirname(FFMPEG_EXE)
 
-# Netscape-format cookies.txt exported from your browser.
-# Upload this as a Render "Secret File" (do NOT commit to git).
 COOKIES_FILE = os.environ.get("COOKIES_FILE", "cookies.txt")
 
 
-# =========================
+# =========================================================
 # FRONTEND
-# =========================
+# =========================================================
 
 @app.route("/")
 def home():
-
-    return send_from_directory(
-        "public",
-        "index.html"
-    )
+    return send_from_directory("public", "index.html")
 
 
 @app.route("/<path:filename>")
 def frontend_files(filename):
-
-    return send_from_directory(
-        "public",
-        filename
-    )
+    return send_from_directory("public", filename)
 
 
-# =========================
-# FIND FILE
-# =========================
+# =========================================================
+# HELPERS
+# =========================================================
 
 def find_file(folder, extensions):
-
     for ext in extensions:
-
         files = glob.glob(
-            os.path.join(
-                folder,
-                f"*.{ext}"
-            )
+            os.path.join(folder, f"*.{ext}")
         )
 
         if files:
-
             return files[0]
 
     return None
 
 
-# =========================
-# FIX AUDIO COMPATIBILITY
-# =========================
-# yt-dlp's merger copies streams as-is ("-c copy"). If the source
-# audio codec (e.g. Opus, from a webm audio track) isn't natively
-# supported by MP4 on the viewer's device/player, the video plays
-# with NO SOUND even though an audio track technically exists.
-# This re-encodes just the audio to AAC (universally compatible),
-# keeping the video stream untouched (fast, no quality loss).
-
 def fix_audio_compatibility(input_path):
+    """
+    Re-encode audio to AAC while keeping the video stream unchanged.
+    This helps make the MP4 more compatible with browsers/devices.
+    """
 
-    output_path = input_path.replace(
-        ".mp4",
-        "_fixed.mp4"
-    )
+    base, ext = os.path.splitext(input_path)
+
+    output_path = f"{base}_fixed{ext}"
 
     result = subprocess.run(
         [
             FFMPEG_EXE,
             "-y",
-            "-i", input_path,
-            "-c:v", "copy",
-            "-c:a", "aac",
-            "-b:a", "192k",
-            "-movflags", "+faststart",
+            "-i",
+            input_path,
+
+            "-map",
+            "0:v:0?",
+            "-map",
+            "0:a:0?",
+
+            "-c:v",
+            "copy",
+
+            "-c:a",
+            "aac",
+
+            "-b:a",
+            "192k",
+
+            "-movflags",
+            "+faststart",
+
             output_path
         ],
         capture_output=True,
@@ -121,35 +103,28 @@ def fix_audio_compatibility(input_path):
     )
 
     if result.returncode != 0 or not os.path.exists(output_path):
-        # if the fix step fails for some reason, fall back to the
-        # original file rather than breaking the whole download
         print(
             "AUDIO FIX FAILED:",
-            result.stderr.decode(errors="ignore")[-400:]
+            result.stderr.decode(errors="ignore")[-2000:]
         )
+
         return input_path
 
     return output_path
 
 
-# =========================
-# DOWNLOAD WITH YT-DLP
-# =========================
-
-def download_media(
-    url,
-    temp_dir,
-    audio_only=False
-):
+def download_media(url, temp_dir, audio_only=False):
+    """
+    Download media using yt-dlp.
+    FFmpeg and FFprobe are provided by the Docker image.
+    """
 
     output_template = os.path.join(
         temp_dir,
         "media.%(ext)s"
     )
 
-
     options = {
-
         "outtmpl": output_template,
 
         "noplaylist": True,
@@ -160,24 +135,31 @@ def download_media(
 
         "no_warnings": False,
 
-        # FIX: tell yt-dlp where ffmpeg is, so it can actually
-        # merge the separate video-only and audio-only streams
-        # into one file with sound.
-        "ffmpeg_location": FFMPEG_PATH
+        # IMPORTANT:
+        # yt-dlp will find both ffmpeg and ffprobe here.
+        "ffmpeg_location": FFMPEG_PATH,
 
+        # Explicitly tell yt-dlp where ffprobe is.
+        "postprocessor_args": [
+            "-loglevel",
+            "warning"
+        ]
     }
 
 
-    # Use cookies if a cookies.txt file has been uploaded
-    # (fixes "Sign in to confirm you're not a bot" on YouTube).
+    # =====================================================
+    # OPTIONAL COOKIES
+    # =====================================================
+
     if os.path.exists(COOKIES_FILE):
+        print("Using cookies file:", COOKIES_FILE)
 
         options["cookiefile"] = COOKIES_FILE
 
 
-    # =====================
-    # MP3 DOWNLOAD
-    # =====================
+    # =====================================================
+    # AUDIO ONLY
+    # =====================================================
 
     if audio_only:
 
@@ -188,41 +170,39 @@ def download_media(
             "postprocessors": [
 
                 {
-
                     "key": "FFmpegExtractAudio",
 
                     "preferredcodec": "mp3",
 
                     "preferredquality": "192"
-
                 }
 
             ]
-
         })
 
 
-    # =====================
-    # VIDEO + AUDIO
-    # =====================
+    # =====================================================
+    # VIDEO
+    # =====================================================
 
     else:
 
         options.update({
 
-            # FIX: "bv*+ba/b" is more reliable than restricting to
-            # ext=mp4 — the old format string sometimes fell back
-            # to a video-only stream on sites like Instagram.
+            # Best available video + audio.
+            # yt-dlp will merge them using FFmpeg.
             "format": "bv*+ba/b",
 
             "merge_output_format": "mp4"
-
         })
 
 
-    with yt_dlp.YoutubeDL(
-        options
-    ) as ydl:
+    print("FFmpeg:", FFMPEG_EXE)
+    print("FFprobe:", FFPROBE_EXE)
+
+    print("Downloading:", url)
+
+    with yt_dlp.YoutubeDL(options) as ydl:
 
         ydl.extract_info(
             url,
@@ -230,39 +210,29 @@ def download_media(
         )
 
 
-# =========================
-# API STATUS
-# =========================
+# =========================================================
+# STATUS API
+# =========================================================
 
-@app.route(
-    "/api/status",
-    methods=["GET"]
-)
-
+@app.route("/api/status", methods=["GET"])
 def status():
 
     return jsonify({
-
         "status": "online",
-
-        "service": "Video Extractor API"
-
+        "service": "Video Extractor API",
+        "ffmpeg": FFMPEG_EXE,
+        "ffprobe": FFPROBE_EXE
     })
 
 
-# =========================
+# =========================================================
 # VIDEO DOWNLOAD API
-# =========================
+# =========================================================
 
-@app.route(
-    "/api/download",
-    methods=["POST"]
-)
-
+@app.route("/api/download", methods=["POST"])
 def download_video():
 
     temp_dir = None
-
 
     try:
 
@@ -270,13 +240,10 @@ def download_video():
             silent=True
         )
 
-
         if not data:
 
             return jsonify({
-
                 "error": "No data received."
-
             }), 400
 
 
@@ -289,50 +256,33 @@ def download_video():
         if not url:
 
             return jsonify({
-
                 "error": "Please enter a URL."
-
             }), 400
 
 
         # Create temporary folder
-
         temp_dir = tempfile.mkdtemp(
             prefix="video-"
         )
 
 
-        # Download video + audio
-
+        # Download
         download_media(
-
             url,
-
             temp_dir,
-
             audio_only=False
-
         )
 
 
-        # Find downloaded video
-
+        # Find downloaded file
         media_file = find_file(
-
             temp_dir,
-
             [
-
                 "mp4",
-
                 "webm",
-
                 "mkv",
-
                 "mov"
-
             ]
-
         )
 
 
@@ -343,16 +293,22 @@ def download_video():
             )
 
 
-        # Fix audio codec compatibility (this is what was
-        # causing "video plays, but no sound")
-        if media_file.endswith(".mp4"):
+        # =================================================
+        # FIX MP4 AUDIO
+        # =================================================
 
-            media_file = fix_audio_compatibility(
+        if media_file.lower().endswith(".mp4"):
+
+            fixed_file = fix_audio_compatibility(
                 media_file
             )
 
+            media_file = fixed_file
 
-        # Send video
+
+        # =================================================
+        # SEND FILE
+        # =================================================
 
         response = send_file(
 
@@ -363,7 +319,6 @@ def download_video():
             download_name="video.mp4",
 
             mimetype="video/mp4"
-
         )
 
 
@@ -377,24 +332,19 @@ def download_video():
             str(error)
         )
 
-
         return jsonify({
-
             "error": str(error)
-
         }), 400
 
 
-# =========================
-# MP3 CONVERSION API
-# =========================
+# =========================================================
+# MP3 CONVERTER API
+# =========================================================
 
-@app.route(
-    "/api/convert/mp3",
-    methods=["POST"]
-)
-
+@app.route("/api/convert/mp3", methods=["POST"])
 def convert_mp3():
+
+    temp_dir = None
 
     try:
 
@@ -406,9 +356,7 @@ def convert_mp3():
         if not data:
 
             return jsonify({
-
                 "error": "No data received."
-
             }), 400
 
 
@@ -421,44 +369,30 @@ def convert_mp3():
         if not url:
 
             return jsonify({
-
                 "error": "Please enter a URL."
-
             }), 400
 
 
         # Create temporary folder
-
         temp_dir = tempfile.mkdtemp(
             prefix="audio-"
         )
 
 
         # Download and convert
-
         download_media(
-
             url,
-
             temp_dir,
-
             audio_only=True
-
         )
 
 
-        # Find MP3 file
-
+        # Find MP3
         mp3_file = find_file(
-
             temp_dir,
-
             [
-
                 "mp3"
-
             ]
-
         )
 
 
@@ -469,7 +403,9 @@ def convert_mp3():
             )
 
 
-        # Send MP3
+        # =================================================
+        # SEND MP3
+        # =================================================
 
         response = send_file(
 
@@ -480,7 +416,6 @@ def convert_mp3():
             download_name="audio.mp3",
 
             mimetype="audio/mpeg"
-
         )
 
 
@@ -494,17 +429,14 @@ def convert_mp3():
             str(error)
         )
 
-
         return jsonify({
-
             "error": str(error)
-
         }), 400
 
 
-# =========================
-# RUN APP
-# =========================
+# =========================================================
+# START SERVER
+# =========================================================
 
 if __name__ == "__main__":
 
@@ -521,6 +453,4 @@ if __name__ == "__main__":
         host="0.0.0.0",
 
         port=port
-
     )
-    
