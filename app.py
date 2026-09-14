@@ -1,489 +1,1007 @@
-from flask import Flask, request, render_template, jsonify, send_file
-import os
-import tempfile
-import threading
-import requests
-import json
+  import os
 import re
-from datetime import datetime
-import yt_dlp
-import instaloader
-from werkzeug.utils import secure_filename
-import zipfile
+import glob
 import shutil
+import socket
+import ipaddress
+import tempfile
+from urllib.parse import urlparse
+
+import requests
+import yt_dlp
+
+from flask import (
+    Flask,
+    request,
+    jsonify,
+    send_file
+)
+
+from flask_cors import CORS
+
+
+# =========================================
+# APP
+# =========================================
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here-change-this'
 
-# Create downloads directory if it doesn't exist
-DOWNLOAD_DIR = os.path.join(os.getcwd(), 'downloads')
-if not os.path.exists(DOWNLOAD_DIR):
-    os.makedirs(DOWNLOAD_DIR)
+CORS(app)
 
-class UniversalDownloader:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
-        
-    def detect_platform(self, url):
-        """Detect the platform from URL"""
-        url = url.lower()
-        if 'youtube.com' in url or 'youtu.be' in url:
-            return 'youtube'
-        elif 'instagram.com' in url:
-            return 'instagram'
-        elif 'facebook.com' in url or 'fb.watch' in url:
-            return 'facebook'
-        elif 'twitter.com' in url or 'x.com' in url:
-            return 'twitter'
-        elif 'tiktok.com' in url:
-            return 'tiktok'
-        elif 'pinterest.com' in url:
-            return 'pinterest'
-        elif 'linkedin.com' in url:
-            return 'linkedin'
-        elif 'snapchat.com' in url:
-            return 'snapchat'
-        elif 'reddit.com' in url:
-            return 'reddit'
-        elif 'twitch.tv' in url:
-            return 'twitch'
-        else:
-            return 'unknown'
-    
-    def create_safe_filename(self, filename, max_length=100):
-        """Create a safe filename"""
-        # Remove invalid characters
-        filename = re.sub(r'[<>:"/\\|?*]', '_', filename)
-        filename = filename.strip()
-        if len(filename) > max_length:
-            filename = filename[:max_length]
-        return filename
-    
-    def download_youtube_content(self, url, path):
-        """Download YouTube videos, shorts, playlists"""
-        try:
-            ydl_opts = {
-                'outtmpl': os.path.join(path, '%(uploader)s - %(title)s.%(ext)s'),
-                'format': 'best[height<=1080]',
-                'writesubtitles': True,
-                'writeautomaticsub': True,
-                'subtitleslangs': ['en'],
-                'ignoreerrors': True,
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                
-                if 'entries' in info:  # Playlist
-                    titles = [entry.get('title', 'Unknown') for entry in info['entries'] if entry]
-                    return {
-                        'status': 'success',
-                        'message': f'Downloaded {len(titles)} videos from playlist',
-                        'titles': titles[:5],  # Show first 5 titles
-                        'type': 'playlist'
-                    }
-                else:  # Single video
-                    return {
-                        'status': 'success',
-                        'message': 'YouTube content downloaded successfully!',
-                        'title': info.get('title', 'Unknown'),
-                        'uploader': info.get('uploader', 'Unknown'),
-                        'type': 'video'
-                    }
-        except Exception as e:
-            return {'status': 'error', 'message': f'YouTube error: {str(e)}'}
-    
-    def download_instagram_content(self, url, path):
-        """Download Instagram posts, reels, stories, IGTV"""
-        try:
-            loader = instaloader.Instaloader(
-                dirname_pattern=path,
-                filename_pattern='{profile}_{mediaid}_{date_utc}',
-                download_videos=True,
-                download_video_thumbnails=False,
-                download_geotags=False,
-                download_comments=False,
-                save_metadata=True,
-                compress_json=False
+
+# =========================================
+# CONFIG
+# =========================================
+
+MAX_URL_LENGTH = 2000
+
+REQUEST_TIMEOUT = 30
+
+USER_AGENT = (
+    "Mozilla/5.0 "
+    "(Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 "
+    "(KHTML, like Gecko) "
+    "Chrome/120.0 Safari/537.36"
+)
+
+
+# =========================================
+# PRIVATE IP CHECK
+# =========================================
+
+def is_private_ip(ip):
+
+    try:
+
+        address = ipaddress.ip_address(ip)
+
+        return (
+
+            address.is_private
+
+            or
+
+            address.is_loopback
+
+            or
+
+            address.is_link_local
+
+            or
+
+            address.is_reserved
+
+            or
+
+            address.is_multicast
+
+        )
+
+    except ValueError:
+
+        return True
+
+
+# =========================================
+# VALIDATE URL
+# =========================================
+
+def validate_url(url):
+
+    if not url:
+
+        raise ValueError(
+            "Please enter a URL."
+        )
+
+
+    if len(url) > MAX_URL_LENGTH:
+
+        raise ValueError(
+            "URL is too long."
+        )
+
+
+    try:
+
+        parsed = urlparse(url)
+
+    except Exception:
+
+        raise ValueError(
+            "Please enter a valid URL."
+        )
+
+
+    if parsed.scheme not in (
+
+        "http",
+
+        "https"
+
+    ):
+
+        raise ValueError(
+            "Only HTTP and HTTPS URLs are allowed."
+        )
+
+
+    hostname = parsed.hostname
+
+
+    if not hostname:
+
+        raise ValueError(
+            "Invalid URL."
+        )
+
+
+    hostname = hostname.lower()
+
+
+    # Block localhost
+
+    if (
+
+        hostname == "localhost"
+
+        or
+
+        hostname.endswith(
+            ".localhost"
+        )
+
+    ):
+
+        raise ValueError(
+            "This URL is not allowed."
+        )
+
+
+    # =====================================
+    # CHECK IP DIRECTLY
+    # =====================================
+
+    try:
+
+        ipaddress.ip_address(
+            hostname
+        )
+
+
+        if is_private_ip(
+            hostname
+        ):
+
+            raise ValueError(
+                "Private network URLs are not allowed."
             )
-            
-            # Handle different Instagram URL types
-            if '/stories/' in url:
-                # Story URL
-                username = self.extract_instagram_username(url)
-                if username:
-                    profile = instaloader.Profile.from_username(loader.context, username)
-                    for story in loader.get_stories([profile.userid]):
-                        for item in story.get_items():
-                            loader.download_storyitem(item, target=username)
-                    return {
-                        'status': 'success',
-                        'message': f'Instagram stories downloaded for {username}',
-                        'type': 'stories'
-                    }
-            elif '/reel/' in url or '/p/' in url or '/tv/' in url:
-                # Post, Reel, or IGTV
-                shortcode = self.extract_instagram_shortcode(url)
-                post = instaloader.Post.from_shortcode(loader.context, shortcode)
-                
-                loader.download_post(post, target=post.owner_username)
-                
-                content_type = 'reel' if post.is_video else 'post'
-                if post.typename == 'GraphSidecar':
-                    content_type = 'carousel'
-                
-                return {
-                    'status': 'success',
-                    'message': f'Instagram {content_type} downloaded successfully!',
-                    'username': post.owner_username,
-                    'caption': post.caption[:100] + '...' if post.caption and len(post.caption) > 100 else post.caption,
-                    'type': content_type
-                }
-            else:
-                # Profile URL - download recent posts
-                username = self.extract_instagram_username(url)
-                profile = instaloader.Profile.from_username(loader.context, username)
-                
-                count = 0
-                for post in profile.get_posts():
-                    if count >= 10:  # Limit to 10 recent posts
-                        break
-                    loader.download_post(post, target=username)
-                    count += 1
-                
-                return {
-                    'status': 'success',
-                    'message': f'Downloaded {count} recent posts from {username}',
-                    'type': 'profile'
-                }
-                
-        except Exception as e:
-            return {'status': 'error', 'message': f'Instagram error: {str(e)}'}
-    
-    def download_tiktok_content(self, url, path):
-        """Download TikTok videos"""
-        try:
-            ydl_opts = {
-                'outtmpl': os.path.join(path, 'TikTok_%(uploader)s_%(title)s.%(ext)s'),
-                'format': 'best',
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                return {
-                    'status': 'success',
-                    'message': 'TikTok video downloaded successfully!',
-                    'title': info.get('title', 'TikTok Video'),
-                    'uploader': info.get('uploader', 'Unknown'),
-                    'type': 'video'
-                }
-        except Exception as e:
-            return {'status': 'error', 'message': f'TikTok error: {str(e)}'}
-    
-    def download_twitter_content(self, url, path):
-        """Download Twitter/X videos, images, threads"""
-        try:
-            ydl_opts = {
-                'outtmpl': os.path.join(path, 'Twitter_%(uploader)s_%(title)s.%(ext)s'),
-                'writesubtitles': True,
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                return {
-                    'status': 'success',
-                    'message': 'Twitter content downloaded successfully!',
-                    'title': info.get('title', 'Twitter Content'),
-                    'uploader': info.get('uploader', 'Unknown'),
-                    'type': 'tweet'
-                }
-        except Exception as e:
-            return {'status': 'error', 'message': f'Twitter error: {str(e)}'}
-    
-    def download_facebook_content(self, url, path):
-        """Download Facebook videos, posts"""
-        try:
-            ydl_opts = {
-                'outtmpl': os.path.join(path, 'Facebook_%(title)s.%(ext)s'),
-                'format': 'best',
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                return {
-                    'status': 'success',
-                    'message': 'Facebook content downloaded successfully!',
-                    'title': info.get('title', 'Facebook Content'),
-                    'type': 'video'
-                }
-        except Exception as e:
-            return {'status': 'error', 'message': f'Facebook error: {str(e)}'}
-    
-    def download_reddit_content(self, url, path):
-        """Download Reddit videos, images, gifs"""
-        try:
-            ydl_opts = {
-                'outtmpl': os.path.join(path, 'Reddit_%(title)s.%(ext)s'),
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                return {
-                    'status': 'success',
-                    'message': 'Reddit content downloaded successfully!',
-                    'title': info.get('title', 'Reddit Post'),
-                    'type': 'post'
-                }
-        except Exception as e:
-            return {'status': 'error', 'message': f'Reddit error: {str(e)}'}
-    
-    def download_generic_content(self, url, path):
-        """Download from any supported platform using yt-dlp"""
-        try:
-            ydl_opts = {
-                'outtmpl': os.path.join(path, '%(extractor)s_%(title)s.%(ext)s'),
-                'format': 'best',
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                return {
-                    'status': 'success',
-                    'message': 'Content downloaded successfully!',
-                    'title': info.get('title', 'Unknown'),
-                    'extractor': info.get('extractor', 'Unknown'),
-                    'type': 'media'
-                }
-        except Exception as e:
-            return {'status': 'error', 'message': f'Download error: {str(e)}'}
-    
-    def extract_instagram_shortcode(self, url):
-        """Extract shortcode from Instagram URL"""
-        patterns = [
-            r'/p/([^/?]+)',
-            r'/reel/([^/?]+)',
-            r'/tv/([^/?]+)'
-        ]
-        for pattern in patterns:
-            match = re.search(pattern, url)
-            if match:
-                return match.group(1)
-        return None
-    
-    def extract_instagram_username(self, url):
-        """Extract username from Instagram URL"""
-        match = re.search(r'instagram\.com/([^/?]+)', url)
-        if match:
-            return match.group(1)
-        return None
-    
-    def download_content(self, url, custom_path=None):
-        """Main download function"""
-        path = custom_path or DOWNLOAD_DIR
-        platform = self.detect_platform(url)
-        
-        # Create timestamped folder for this download
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        download_folder = os.path.join(path, f"{platform}_{timestamp}")
-        os.makedirs(download_folder, exist_ok=True)
-        
-        try:
-            if platform == 'youtube':
-                return self.download_youtube_content(url, download_folder)
-            elif platform == 'instagram':
-                return self.download_instagram_content(url, download_folder)
-            elif platform == 'tiktok':
-                return self.download_tiktok_content(url, download_folder)
-            elif platform == 'twitter':
-                return self.download_twitter_content(url, download_folder)
-            elif platform == 'facebook':
-                return self.download_facebook_content(url, download_folder)
-            elif platform == 'reddit':
-                return self.download_reddit_content(url, download_folder)
-            else:
-                # Try generic download for other platforms
-                return self.download_generic_content(url, download_folder)
-                
-        except Exception as e:
-            return {'status': 'error', 'message': f'Unexpected error: {str(e)}'}
 
-# Initialize downloader
-downloader = UniversalDownloader()
 
-@app.route('/')
-def index():
-    """Main page"""
-    return render_template('index.html')
+        return url
 
-@app.route('/download', methods=['POST'])
-def download():
-    """Handle download requests"""
+
+    except ValueError as error:
+
+        # Real validation error
+
+        if (
+
+            "Private network"
+
+            in str(error)
+
+        ):
+
+            raise error
+
+
+    except Exception:
+
+        pass
+
+
+    # =====================================
+    # DNS CHECK
+    # =====================================
+
     try:
-        data = request.get_json()
-        url = data.get('url', '').strip()
-        
-        if not url:
-            return jsonify({'status': 'error', 'message': 'URL is required'})
-        
-        # Detect platform automatically
-        platform = downloader.detect_platform(url)
-        
-        # Start download
-        result = downloader.download_content(url)
-        result['platform'] = platform
-        
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': f'Server error: {str(e)}'})
 
-@app.route('/bulk-download', methods=['POST'])
-def bulk_download():
-    """Handle bulk download requests"""
-    try:
-        data = request.get_json()
-        urls = data.get('urls', [])
-        
-        if not urls:
-            return jsonify({'status': 'error', 'message': 'URLs list is required'})
-        
-        results = []
-        for url in urls:
-            if url.strip():
-                result = downloader.download_content(url.strip())
-                result['url'] = url
-                results.append(result)
-        
-        return jsonify({
-            'status': 'success',
-            'message': f'Processed {len(results)} URLs',
-            'results': results
-        })
-        
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': f'Bulk download error: {str(e)}'})
+        addresses = socket.getaddrinfo(
 
-@app.route('/downloads')
-def list_downloads():
-    """List downloaded files and folders"""
-    try:
-        items = []
-        if os.path.exists(DOWNLOAD_DIR):
-            for item in os.listdir(DOWNLOAD_DIR):
-                item_path = os.path.join(DOWNLOAD_DIR, item)
-                if os.path.isfile(item_path):
-                    items.append({
-                        'name': item,
-                        'type': 'file',
-                        'size': os.path.getsize(item_path)
-                    })
-                elif os.path.isdir(item_path):
-                    file_count = len([f for f in os.listdir(item_path) if os.path.isfile(os.path.join(item_path, f))])
-                    items.append({
-                        'name': item,
-                        'type': 'folder',
-                        'file_count': file_count
-                    })
-        
-        return jsonify({'items': items})
-    except Exception as e:
-        return jsonify({'error': str(e)})
+            hostname,
 
-@app.route('/download-file/<path:filename>')
-def download_file(filename):
-    """Download a specific file"""
-    try:
-        safe_filename = secure_filename(filename)
-        file_path = os.path.join(DOWNLOAD_DIR, safe_filename)
-        
-        if os.path.exists(file_path):
-            return send_file(file_path, as_attachment=True)
+            None
+
+        )
+
+
+        ips = set(
+
+            item[4][0]
+
+            for item in addresses
+
+        )
+
+
+        if not ips:
+
+            raise ValueError(
+                "Could not resolve this URL."
+            )
+
+
+        for ip in ips:
+
+            if is_private_ip(ip):
+
+                raise ValueError(
+                    "This URL is not allowed."
+                )
+
+
+    except socket.gaierror:
+
+        raise ValueError(
+            "Could not resolve this URL."
+        )
+
+
+    return url
+
+
+# =========================================
+# GET URL FROM REQUEST
+# =========================================
+
+def get_request_url():
+
+    data = request.get_json(
+        silent=True
+    )
+
+
+    if not data:
+
+        raise ValueError(
+            "No data received."
+        )
+
+
+    url = data.get(
+
+        "url",
+
+        ""
+
+    ).strip()
+
+
+    return validate_url(
+        url
+    )
+
+
+# =========================================
+# SAFE FILENAME
+# =========================================
+
+def safe_filename(name):
+
+    name = re.sub(
+
+        r'[^a-zA-Z0-9._-]',
+
+        "_",
+
+        name
+
+    )
+
+
+    return name[:100]
+
+
+# =========================================
+# FIND FILE
+# =========================================
+
+def find_file(
+
+    folder,
+
+    extensions
+
+):
+
+    for extension in extensions:
+
+        pattern = os.path.join(
+
+            folder,
+
+            f"*.{extension}"
+
+        )
+
+
+        files = glob.glob(
+            pattern
+        )
+
+
+        if files:
+
+            return files[0]
+
+
+    return None
+
+
+# =========================================
+# CHECK IF DIRECT MEDIA URL
+# =========================================
+
+def is_direct_media_url(url):
+
+    path = urlparse(
+        url
+    ).path.lower()
+
+
+    extensions = (
+
+        ".mp4",
+
+        ".webm",
+
+        ".mkv",
+
+        ".mov",
+
+        ".avi",
+
+        ".mp3",
+
+        ".m4a",
+
+        ".wav",
+
+        ".ogg",
+
+        ".aac"
+
+    )
+
+
+    return path.endswith(
+        extensions
+    )
+
+
+# =========================================
+# DIRECT MEDIA DOWNLOAD
+# =========================================
+
+def download_direct_media(
+
+    url,
+
+    temp_dir
+
+):
+
+    response = requests.get(
+
+        url,
+
+        stream=True,
+
+        timeout=REQUEST_TIMEOUT,
+
+        allow_redirects=True,
+
+        headers={
+
+            "User-Agent":
+
+            USER_AGENT
+
+        }
+
+    )
+
+
+    response.raise_for_status()
+
+
+    # Validate final redirect URL
+
+    validate_url(
+        response.url
+    )
+
+
+    content_type = (
+
+        response.headers.get(
+
+            "content-type",
+
+            ""
+
+        )
+
+        .lower()
+
+    )
+
+
+    # Filename
+
+    parsed = urlparse(
+        response.url
+    )
+
+
+    filename = os.path.basename(
+        parsed.path
+    )
+
+
+    if not filename:
+
+        filename = "media"
+
+
+    filename = safe_filename(
+        filename
+    )
+
+
+    # Add extension if missing
+
+    if "." not in filename:
+
+        if "video" in content_type:
+
+            filename += ".mp4"
+
+        elif "audio" in content_type:
+
+            filename += ".mp3"
+
         else:
-            return jsonify({'error': 'File not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
-@app.route('/download-folder/<foldername>')
-def download_folder(foldername):
-    """Download a folder as ZIP"""
-    try:
-        safe_foldername = secure_filename(foldername)
-        folder_path = os.path.join(DOWNLOAD_DIR, safe_foldername)
-        
-        if os.path.exists(folder_path) and os.path.isdir(folder_path):
-            # Create a temporary ZIP file
-            temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
-            temp_zip.close()
-            
-            with zipfile.ZipFile(temp_zip.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for root, dirs, files in os.walk(folder_path):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, folder_path)
-                        zipf.write(file_path, arcname)
-            
-            return send_file(temp_zip.name, as_attachment=True, download_name=f'{safe_foldername}.zip')
-        else:
-            return jsonify({'error': 'Folder not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+            filename += ".media"
 
-@app.route('/supported-platforms')
-def supported_platforms():
-    """List supported platforms"""
-    platforms = {
-        'video_platforms': [
-            'YouTube (videos, shorts, playlists)',
-            'TikTok',
-            'Twitter/X',
-            'Facebook',
-            'Instagram (Reels, IGTV)',
-            'Reddit',
-            'Twitch',
-            'Vimeo',
-            'Dailymotion'
-        ],
-        'social_platforms': [
-            'Instagram (Posts, Stories, Reels, IGTV)',
-            'Twitter/X (Tweets, Threads)',
-            'Facebook (Posts, Videos)',
-            'Reddit (Posts, Images, Videos)',
-            'LinkedIn (Posts)',
-            'Pinterest (Pins)'
-        ],
-        'features': [
-            'Auto-platform detection',
-            'Bulk downloads',
-            'Stories download',
-            'Playlist support',
-            'High quality downloads',
-            'Metadata preservation',
-            'Subtitle downloads'
-        ]
+
+    file_path = os.path.join(
+
+        temp_dir,
+
+        filename
+
+    )
+
+
+    with open(
+
+        file_path,
+
+        "wb"
+
+    ) as file:
+
+        for chunk in response.iter_content(
+
+            chunk_size=8192
+
+        ):
+
+            if chunk:
+
+                file.write(
+                    chunk
+                )
+
+
+    return file_path
+
+
+# =========================================
+# YT-DLP DOWNLOAD
+# =========================================
+
+def download_with_ytdlp(
+
+    url,
+
+    temp_dir,
+
+    audio_only=False
+
+):
+
+    output_template = os.path.join(
+
+        temp_dir,
+
+        "media.%(ext)s"
+
+    )
+
+
+    options = {
+
+        "outtmpl":
+
+        output_template,
+
+
+        "noplaylist":
+
+        True,
+
+
+        "quiet":
+
+        True,
+
+
+        "no_warnings":
+
+        True,
+
+
+        "restrictfilenames":
+
+        True
+
+
     }
-    return jsonify(platforms)
 
-@app.route('/clear-downloads', methods=['POST'])
-def clear_downloads():
-    """Clear all downloaded files"""
+
+    # =====================================
+    # AUDIO / MP3
+    # =====================================
+
+    if audio_only:
+
+        options.update({
+
+            "format":
+
+            "bestaudio/best",
+
+
+            "postprocessors":
+
+            [
+
+                {
+
+                    "key":
+
+                    "FFmpegExtractAudio",
+
+
+                    "preferredcodec":
+
+                    "mp3",
+
+
+                    "preferredquality":
+
+                    "192"
+
+                }
+
+            ]
+
+        })
+
+
+    # =====================================
+    # VIDEO
+    # =====================================
+
+    else:
+
+        options.update({
+
+            "format":
+
+            (
+                "bestvideo[ext=mp4]"
+                "+bestaudio/"
+                "best[ext=mp4]/best"
+            ),
+
+
+            "merge_output_format":
+
+            "mp4"
+
+        })
+
+
+    with yt_dlp.YoutubeDL(
+
+        options
+
+    ) as ydl:
+
+
+        info = ydl.extract_info(
+
+            url,
+
+            download=True
+
+        )
+
+
+    return info
+
+
+# =========================================
+# STATUS
+# =========================================
+
+@app.route(
+
+    "/api/status",
+
+    methods=["GET"]
+
+)
+
+def status():
+
+    return jsonify({
+
+        "status":
+
+        "online",
+
+
+        "service":
+
+        "Video Extractor API"
+
+    })
+
+
+# =========================================
+# MP4 DOWNLOAD
+# =========================================
+
+@app.route(
+
+    "/api/download",
+
+    methods=["POST"]
+
+)
+
+def download_video():
+
+    temp_dir = None
+
+
     try:
-        if os.path.exists(DOWNLOAD_DIR):
-            shutil.rmtree(DOWNLOAD_DIR)
-            os.makedirs(DOWNLOAD_DIR)
-        return jsonify({'status': 'success', 'message': 'Downloads cleared successfully'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': f'Error clearing downloads: {str(e)}'})
 
-if __name__ == '__main__':
-    print("=" * 60)
-    print("UNIVERSAL SOCIAL MEDIA DOWNLOADER")
-    print("=" * 60)
-    print("Starting server...")
-    print("Supported platforms: YouTube, Instagram, TikTok, Twitter/X, Facebook, Reddit, and more!")
-    print("Features: Stories, Reels, Posts, Videos, Bulk downloads")
-    print("Server running on: http://localhost:5000")
-    print("=" * 60)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+        url = get_request_url()
+
+
+        temp_dir = tempfile.mkdtemp(
+
+            prefix="video-extractor-"
+
+        )
+
+
+        # =================================
+        # TRY DIRECT MEDIA FIRST
+        # =================================
+
+        media_file = None
+
+
+        if is_direct_media_url(
+
+            url
+
+        ):
+
+            try:
+
+                media_file = (
+
+                    download_direct_media(
+
+                        url,
+
+                        temp_dir
+
+                    )
+
+                )
+
+            except Exception as error:
+
+                print(
+
+                    "Direct download failed:",
+
+                    error
+
+                )
+
+
+        # =================================
+        # YT-DLP
+        # =================================
+
+        if not media_file:
+
+            download_with_ytdlp(
+
+                url,
+
+                temp_dir
+
+            )
+
+
+            media_file = find_file(
+
+                temp_dir,
+
+                [
+
+                    "mp4",
+
+                    "webm",
+
+                    "mkv",
+
+                    "mov"
+
+                ]
+
+            )
+
+
+        if not media_file:
+
+            raise Exception(
+
+                "Could not find downloaded media."
+
+            )
+
+
+        response = send_file(
+
+            media_file,
+
+            as_attachment=True,
+
+            download_name=
+
+            "media.mp4"
+
+        )
+
+
+        @response.call_on_close
+        def cleanup():
+
+            shutil.rmtree(
+
+                temp_dir,
+
+                ignore_errors=True
+
+            )
+
+
+        return response
+
+
+    except Exception as error:
+
+        print(
+
+            "DOWNLOAD ERROR:",
+
+            str(error)
+
+        )
+
+
+        if temp_dir:
+
+            shutil.rmtree(
+
+                temp_dir,
+
+                ignore_errors=True
+
+            )
+
+
+        return jsonify({
+
+            "error":
+
+            "Unable to download this public media URL."
+
+        }), 400
+
+
+# =========================================
+# MP3 CONVERSION
+# =========================================
+
+@app.route(
+
+    "/api/convert/mp3",
+
+    methods=["POST"]
+
+)
+
+def convert_mp3():
+
+    temp_dir = None
+
+
+    try:
+
+        url = get_request_url()
+
+
+        temp_dir = tempfile.mkdtemp(
+
+            prefix="video-extractor-"
+
+        )
+
+
+        # =================================
+        # DOWNLOAD + CONVERT
+        # =================================
+
+        download_with_ytdlp(
+
+            url,
+
+            temp_dir,
+
+            audio_only=True
+
+        )
+
+
+        mp3_file = find_file(
+
+            temp_dir,
+
+            [
+
+                "mp3"
+
+            ]
+
+        )
+
+
+        if not mp3_file:
+
+            raise Exception(
+
+                "MP3 conversion failed."
+
+            )
+
+
+        response = send_file(
+
+            mp3_file,
+
+            as_attachment=True,
+
+            download_name=
+
+            "audio.mp3",
+
+
+            mimetype=
+
+            "audio/mpeg"
+
+        )
+
+
+        @response.call_on_close
+        def cleanup():
+
+            shutil.rmtree(
+
+                temp_dir,
+
+                ignore_errors=True
+
+            )
+
+
+        return response
+
+
+    except Exception as error:
+
+        print(
+
+            "MP3 ERROR:",
+
+            str(error)
+
+        )
+
+
+        if temp_dir:
+
+            shutil.rmtree(
+
+                temp_dir,
+
+                ignore_errors=True
+
+            )
+
+
+        return jsonify({
+
+            "error":
+
+            "Unable to convert this public media URL."
+
+        }), 400
+
+
+# =========================================
+# RUN APP
+# =========================================
+
+if __name__ == "__main__":
+
+    port = int(
+
+        os.environ.get(
+
+            "PORT",
+
+            5000
+
+        )
+
+    )
+
+
+    app.run(
+
+        host=
+
+        "0.0.0.0",
+
+
+        port=
+
+        port
+
+                )                  
