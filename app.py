@@ -29,12 +29,15 @@ FFMPEG_EXE = shutil.which("ffmpeg") or "/usr/bin/ffmpeg"
 FFPROBE_EXE = shutil.which("ffprobe") or "/usr/bin/ffprobe"
 FFMPEG_PATH = os.path.dirname(FFMPEG_EXE)
 
-# Generic fallback cookies file (used if no platform-specific one is set)
 COOKIES_FILE = os.environ.get("COOKIES_FILE", "cookies.txt")
-
-# Optional platform-specific cookies (recommended for YouTube especially)
-COOKIES_YOUTUBE_FILE = os.environ.get("COOKIES_YOUTUBE_FILE", "cookies_youtube.txt")
-COOKIES_INSTAGRAM_FILE = os.environ.get("COOKIES_INSTAGRAM_FILE", "cookies_instagram.txt")
+COOKIES_YOUTUBE_FILE = os.environ.get(
+    "COOKIES_YOUTUBE_FILE",
+    "cookies_youtube.txt"
+)
+COOKIES_INSTAGRAM_FILE = os.environ.get(
+    "COOKIES_INSTAGRAM_FILE",
+    "cookies_instagram.txt"
+)
 
 
 # =========================================================
@@ -64,10 +67,6 @@ def find_file(folder, extensions):
 
 
 def pick_cookies_file(url):
-    """
-    Use a platform-specific cookies file if it exists, else fall back
-    to the generic one. Returns None if nothing is available.
-    """
     url_lower = url.lower()
 
     if "youtube.com" in url_lower or "youtu.be" in url_lower:
@@ -85,9 +84,6 @@ def pick_cookies_file(url):
 
 
 def has_audio_stream(path):
-    """
-    Ask ffprobe whether the file actually contains an audio stream.
-    """
     try:
         result = subprocess.run(
             [
@@ -102,18 +98,15 @@ def has_audio_stream(path):
             text=True,
             timeout=30
         )
+
         return bool(result.stdout.strip())
+
     except Exception as e:
         print("ffprobe check failed:", e)
-        # If we can't check, assume it's fine rather than blocking the download
         return True
 
 
 def fix_audio_compatibility(input_path):
-    """
-    Re-encode audio to AAC while keeping the video stream unchanged.
-    This helps make the MP4 more compatible with browsers/devices.
-    """
     base, ext = os.path.splitext(input_path)
     output_path = f"{base}_fixed{ext}"
 
@@ -135,14 +128,25 @@ def fix_audio_compatibility(input_path):
     )
 
     if result.returncode != 0 or not os.path.exists(output_path):
-        print("AUDIO FIX FAILED:", result.stderr.decode(errors="ignore")[-2000:])
+        print(
+            "AUDIO FIX FAILED:",
+            result.stderr.decode(errors="ignore")[-2000:]
+        )
         return input_path
 
     return output_path
 
 
-def build_ydl_options(url, temp_dir, audio_only, format_override=None):
-    output_template = os.path.join(temp_dir, "media.%(ext)s")
+def build_ydl_options(
+    url,
+    temp_dir,
+    audio_only,
+    format_override=None
+):
+    output_template = os.path.join(
+        temp_dir,
+        "media.%(ext)s"
+    )
 
     options = {
         "outtmpl": output_template,
@@ -150,18 +154,20 @@ def build_ydl_options(url, temp_dir, audio_only, format_override=None):
         "restrictfilenames": True,
         "quiet": False,
         "no_warnings": False,
-        "ffmpeg_location": FFMPEG_PATH,
-        "postprocessor_args": ["-loglevel", "warning"],
 
-        # Network resilience — YouTube/Instagram both throw transient
-        # errors fairly often; retry instead of failing immediately.
+        "ffmpeg_location": FFMPEG_PATH,
+
+        "postprocessor_args": [
+            "-loglevel",
+            "warning"
+        ],
+
         "retries": 10,
         "fragment_retries": 10,
         "socket_timeout": 60,
         "extractor_retries": 5,
         "file_access_retries": 5,
 
-        # Enhanced anti-bot headers: realistic browser fingerprint
         "http_headers": {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -175,33 +181,40 @@ def build_ydl_options(url, temp_dir, audio_only, format_override=None):
             "Upgrade-Insecure-Requests": "1"
         },
 
-        # Try multiple player clients to bypass bot detection
         "extractor_args": {
             "youtube": {
-                # Use multiple clients; yt-dlp will try them in order
-                # android/ios clients often bypass bot checks better than web
-                "player_client": ["android", "web", "ios"],
+                "player_client": [
+                    "android",
+                    "web",
+                    "ios"
+                ]
             }
         },
 
-        # Additional options to avoid being blocked
-        "quiet": False,
-        "no_color": False,
         "progress": True,
-        "progress_template": "%(progress.total_size)s at %(progress._speed_str)s",
+
+        "progress_template":
+            "%(progress.total_size)s at %(progress._speed_str)s",
+
         "geo_bypass": True,
         "geo_bypass_country": "US",
+
         "check_fragments": True,
     }
 
     cookies_file = pick_cookies_file(url)
+
     if cookies_file:
-        print("Using cookies file:", cookies_file)
+        print(
+            "Using cookies file:",
+            cookies_file
+        )
         options["cookiefile"] = cookies_file
 
     if audio_only:
         options.update({
             "format": "bestaudio/best",
+
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -210,31 +223,47 @@ def build_ydl_options(url, temp_dir, audio_only, format_override=None):
                 }
             ]
         })
+
     else:
         options.update({
-            "format": format_override or "bv*+ba/b",
+            "format":
+                format_override or "bv*+ba/b",
+
             "merge_output_format": "mp4"
         })
 
     return options
 
 
-def download_media(url, temp_dir, audio_only=False, format_override=None):
-    """
-    Download media using yt-dlp. FFmpeg/ffprobe come from the Docker image.
-    """
-    options = build_ydl_options(url, temp_dir, audio_only, format_override)
+def download_media(
+    url,
+    temp_dir,
+    audio_only=False,
+    format_override=None
+):
+    options = build_ydl_options(
+        url,
+        temp_dir,
+        audio_only,
+        format_override
+    )
 
     print("FFmpeg:", FFMPEG_EXE)
     print("FFprobe:", FFPROBE_EXE)
     print("Downloading:", url)
 
     with yt_dlp.YoutubeDL(options) as ydl:
-        ydl.extract_info(url, download=True)
+        ydl.extract_info(
+            url,
+            download=True
+        )
 
 
 def cleanup_temp_dir(path):
-    shutil.rmtree(path, ignore_errors=True)
+    shutil.rmtree(
+        path,
+        ignore_errors=True
+    )
 
 
 # =========================================================
@@ -257,59 +286,135 @@ def status():
 
 @app.route("/api/download", methods=["POST"])
 def download_video():
+
     temp_dir = None
 
     try:
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify({"error": "No data received."}), 400
 
-        url = data.get("url", "").strip()
+        data = request.get_json(
+            silent=True
+        )
+
+        # FIX:
+        # Make sure frontend sends a JSON object
+        # instead of a JSON string.
+        if not isinstance(data, dict):
+            return jsonify({
+                "error":
+                    "Invalid request format. "
+                    "Expected JSON object."
+            }), 400
+
+        url = data.get(
+            "url",
+            ""
+        ).strip()
+
         if not url:
-            return jsonify({"error": "Please enter a URL."}), 400
+            return jsonify({
+                "error":
+                    "Please enter a URL."
+            }), 400
 
-        temp_dir = tempfile.mkdtemp(prefix="video-")
+        temp_dir = tempfile.mkdtemp(
+            prefix="video-"
+        )
 
-        # First attempt: best video + best audio, merged.
-        download_media(url, temp_dir, audio_only=False)
+        # Download best video + audio
+        download_media(
+            url,
+            temp_dir,
+            audio_only=False
+        )
 
-        media_file = find_file(temp_dir, ["mp4", "webm", "mkv", "mov"])
+        media_file = find_file(
+            temp_dir,
+            [
+                "mp4",
+                "webm",
+                "mkv",
+                "mov"
+            ]
+        )
 
         if not media_file:
-            raise Exception("Video file not found.")
+            raise Exception(
+                "Video file not found."
+            )
 
         # =================================================
-        # VERIFY AUDIO — retry once with a progressive format
-        # if the merged file somehow ended up silent.
+        # CHECK AUDIO
         # =================================================
-        if not has_audio_stream(media_file):
-            print("No audio stream detected, retrying with progressive format...")
 
-            shutil.rmtree(temp_dir, ignore_errors=True)
-            temp_dir = tempfile.mkdtemp(prefix="video-retry-")
+        if not has_audio_stream(
+            media_file
+        ):
+
+            print(
+                "No audio stream detected, "
+                "retrying with progressive format..."
+            )
+
+            shutil.rmtree(
+                temp_dir,
+                ignore_errors=True
+            )
+
+            temp_dir = tempfile.mkdtemp(
+                prefix="video-retry-"
+            )
 
             try:
+
                 download_media(
                     url,
                     temp_dir,
                     audio_only=False,
-                    format_override="best[acodec!=none][vcodec!=none]/best"
+                    format_override=(
+                        "best"
+                        "[acodec!=none]"
+                        "[vcodec!=none]"
+                        "/best"
+                    )
                 )
-                retry_file = find_file(temp_dir, ["mp4", "webm", "mkv", "mov"])
+
+                retry_file = find_file(
+                    temp_dir,
+                    [
+                        "mp4",
+                        "webm",
+                        "mkv",
+                        "mov"
+                    ]
+                )
+
                 if retry_file:
                     media_file = retry_file
+
             except Exception as retry_error:
-                print("Audio retry failed, using original file:", retry_error)
+
+                print(
+                    "Audio retry failed, "
+                    "using original file:",
+                    retry_error
+                )
 
         # =================================================
         # FIX MP4 AUDIO COMPATIBILITY
         # =================================================
-        if media_file.lower().endswith(".mp4"):
-            media_file = fix_audio_compatibility(media_file)
+
+        if media_file.lower().endswith(
+            ".mp4"
+        ):
+
+            media_file = fix_audio_compatibility(
+                media_file
+            )
 
         # =================================================
-        # SEND FILE (and clean up temp dir once sent)
+        # SEND FILE
         # =================================================
+
         response = send_file(
             media_file,
             as_attachment=True,
@@ -317,44 +422,89 @@ def download_video():
             mimetype="video/mp4"
         )
 
-        response.call_on_close(lambda: cleanup_temp_dir(temp_dir))
+        response.call_on_close(
+            lambda: cleanup_temp_dir(
+                temp_dir
+            )
+        )
 
         return response
 
     except Exception as error:
-        print("DOWNLOAD ERROR:", str(error))
+
+        print(
+            "DOWNLOAD ERROR:",
+            str(error)
+        )
 
         if temp_dir:
-            cleanup_temp_dir(temp_dir)
+            cleanup_temp_dir(
+                temp_dir
+            )
 
-        return jsonify({"error": str(error)}), 400
+        return jsonify({
+            "error":
+                str(error)
+        }), 400
 
 
 # =========================================================
 # MP3 CONVERTER API
 # =========================================================
 
-@app.route("/api/convert/mp3", methods=["POST"])
+@app.route(
+    "/api/convert/mp3",
+    methods=["POST"]
+)
 def convert_mp3():
+
     temp_dir = None
 
     try:
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify({"error": "No data received."}), 400
 
-        url = data.get("url", "").strip()
+        data = request.get_json(
+            silent=True
+        )
+
+        # FIX:
+        # Make sure frontend sends a JSON object
+        if not isinstance(data, dict):
+            return jsonify({
+                "error":
+                    "Invalid request format. "
+                    "Expected JSON object."
+            }), 400
+
+        url = data.get(
+            "url",
+            ""
+        ).strip()
+
         if not url:
-            return jsonify({"error": "Please enter a URL."}), 400
+            return jsonify({
+                "error":
+                    "Please enter a URL."
+            }), 400
 
-        temp_dir = tempfile.mkdtemp(prefix="audio-")
+        temp_dir = tempfile.mkdtemp(
+            prefix="audio-"
+        )
 
-        download_media(url, temp_dir, audio_only=True)
+        download_media(
+            url,
+            temp_dir,
+            audio_only=True
+        )
 
-        mp3_file = find_file(temp_dir, ["mp3"])
+        mp3_file = find_file(
+            temp_dir,
+            ["mp3"]
+        )
 
         if not mp3_file:
-            raise Exception("MP3 file not found.")
+            raise Exception(
+                "MP3 file not found."
+            )
 
         response = send_file(
             mp3_file,
@@ -363,17 +513,30 @@ def convert_mp3():
             mimetype="audio/mpeg"
         )
 
-        response.call_on_close(lambda: cleanup_temp_dir(temp_dir))
+        response.call_on_close(
+            lambda: cleanup_temp_dir(
+                temp_dir
+            )
+        )
 
         return response
 
     except Exception as error:
-        print("MP3 ERROR:", str(error))
+
+        print(
+            "MP3 ERROR:",
+            str(error)
+        )
 
         if temp_dir:
-            cleanup_temp_dir(temp_dir)
+            cleanup_temp_dir(
+                temp_dir
+            )
 
-        return jsonify({"error": str(error)}), 400
+        return jsonify({
+            "error":
+                str(error)
+        }), 400
 
 
 # =========================================================
@@ -381,5 +544,15 @@ def convert_mp3():
 # =========================================================
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+
+    port = int(
+        os.environ.get(
+            "PORT",
+            5000
+        )
+    )
+
+    app.run(
+        host="0.0.0.0",
+        port=port
+        )
