@@ -129,152 +129,6 @@ body.cyber-theme {
 
 
 /* =========================
-   AMBIENT STARS + GLOW (DEFAULT)
-========================= */
-
-.ambient-stars {
-
-  position: fixed;
-
-  inset: 0;
-
-  z-index: -9;
-
-  pointer-events: none;
-
-  opacity: .5;
-
-  transition: opacity .6s ease;
-
-  background-image:
-
-  radial-gradient(
-    circle,
-    rgba(255,255,255,.8) 1px,
-    transparent 1px
-  ),
-
-  radial-gradient(
-    circle,
-    rgba(150,120,255,.45) 1px,
-    transparent 1px
-  );
-
-  background-size: 110px 110px, 170px 170px;
-
-  background-position: 20px 30px, 80px 90px;
-
-  animation:
-  ambientStarMove
-  30s
-  linear
-  infinite;
-
-}
-
-@keyframes ambientStarMove {
-
-  from {
-
-    background-position:
-    20px 30px,
-    80px 90px;
-
-  }
-
-  to {
-
-    background-position:
-    130px 150px,
-    250px 270px;
-
-  }
-
-}
-
-.ambient-glow {
-
-  position: fixed;
-
-  width: 700px;
-
-  height: 700px;
-
-  left: 50%;
-
-  top: 45%;
-
-  transform: translate(-50%, -50%);
-
-  z-index: -9;
-
-  pointer-events: none;
-
-  background:
-
-  radial-gradient(
-    circle,
-    rgba(117, 55, 220, .13),
-    rgba(30, 30, 100, .05),
-    transparent 68%
-  );
-
-  filter: blur(20px);
-
-  animation:
-  ambientBreathe
-  6s
-  ease-in-out
-  infinite;
-
-  opacity: 1;
-
-  transition: opacity .6s ease;
-
-}
-
-@keyframes ambientBreathe {
-
-  0%,
-  100% {
-
-    transform:
-    translate(-50%, -50%)
-    scale(1);
-
-    opacity: .8;
-
-  }
-
-  50% {
-
-    transform:
-    translate(-50%, -50%)
-    scale(1.12);
-
-    opacity: 1;
-
-  }
-
-}
-
-body.spider-theme .ambient-stars,
-body.galaxy-theme .ambient-stars,
-body.ocean-theme .ambient-stars,
-body.dark-theme .ambient-stars,
-body.cyber-theme .ambient-stars,
-body.spider-theme .ambient-glow,
-body.galaxy-theme .ambient-glow,
-body.ocean-theme .ambient-glow,
-body.dark-theme .ambient-glow,
-body.cyber-theme .ambient-glow {
-
-  opacity: 0;
-
-}
-
-
-/* =========================
    BACKGROUND
 ========================= */
 
@@ -378,413 +232,6 @@ body.cyber-theme .blob {
     );
 
   }
-
-}
-
-
-/* =========================
-   OCEAN THEME
-========================= */
-
-.ocean-waves {
-
-  position: fixed;
-
-  inset: 0;
-
-  overflow: hidden;
-
-  pointer-events: none;
-
-  z-index: -9;
-
-  opacity: 0;
-
-  transition:
-  opacity .7s ease;
-
-}
-
-
-body.ocean-theme
-.ocean-waves {
-
-  opacity: 1;
-
-}
-
-
-.ocean-wave {
-
-  position: absolute;
-
-  width: 180%;
-
-  height: 300px;
-
-  left: -40%;
-
-  border-radius: 45%;
-
-  background:
-
-  rgba(
-    0,
-    229,
-    255,
-    .08
-  );
-
-  filter:
-  blur(20px);
-
-  animation:
-  oceanMove
-  12s
-  ease-in-out
-  infinite;
-
-}
-
-
-.wave1 {
-
-  bottom: -150px;
-
-}
-
-
-.wave2 {
-
-  bottom: -180px;
-
-  background:
-  rgba(0,150,255,.1);
-
-  animation-delay:
-  -5s;
-
-}
-
-
-.wave3 {
-
-  bottom: -210px;
-
-  background:
-  rgba(0,255,220,.06);
-
-  animation-delay:
-  -8s;
-
-}
-
-
-@keyframes oceanMove {
-
-  0%,
-  100% {
-
-    transform:
-    translateX(-5%)
-    rotate(0deg);
-
-  }
-
-
-  50% {
-
-    transform:
-    translateX(5%)
-    rotate(3deg);
-
-  }
-
-}
-
-
-body.ocean-theme {
-
-  --accent: #00e5ff;
-
-  --accent2: #0077ff;
-
-  --accent-rgb: 0, 229, 255;
-
-  --bg: #010a0e;
-
-  background:
-
-  radial-gradient(
-    circle at top left,
-    rgba(0,229,255,.08),
-    transparent 40%
-  ),
-
-  radial-gradient(
-    circle at bottom right,
-    rgba(0,119,255,.06),
-    transparent 40%
-  ),
-
-  linear-gradient(
-    180deg,
-    #021620 0%,
-    #010d14 30%,
-    #01080d 65%,
-    #000306 100%
-  );
-
-}
-
-
-/* =========================
-   OCEAN BUBBLES
-========================= */
-
-.ocean-bubbles {
-
-  position: fixed;
-
-  inset: 0;
-
-  pointer-events: none;
-
-  z-index: -6;
-
-  opacity: 0;
-
-  transition:
-  opacity .6s ease;
-
-}
-
-
-body.ocean-theme
-.ocean-bubbles {
-
-  opacity: 1;
-
-}
-
-
-.bubble {
-
-  position: absolute;
-
-  width: 10px;
-
-  height: 10px;
-
-  border-radius: 50%;
-
-  border:
-
-  1px solid
-  rgba(150,255,255,.45);
-
-  box-shadow:
-
-  0 0 15px
-  rgba(0,229,255,.2);
-
-  animation:
-  bubbleRise
-  8s
-  linear
-  infinite;
-
-}
-
-
-.bubble:nth-child(1) {
-
-  left: 10%;
-  bottom: -20px;
-
-}
-
-
-.bubble:nth-child(2) {
-
-  left: 25%;
-  bottom: -40px;
-
-  width: 6px;
-  height: 6px;
-
-  animation-delay: 2s;
-
-}
-
-
-.bubble:nth-child(3) {
-
-  left: 45%;
-  bottom: -30px;
-
-  animation-delay: 4s;
-
-}
-
-
-.bubble:nth-child(4) {
-
-  left: 70%;
-  bottom: -50px;
-
-  width: 14px;
-  height: 14px;
-
-  animation-delay: 1s;
-
-}
-
-
-@keyframes bubbleRise {
-
-  from {
-
-    transform:
-    translateY(0);
-
-    opacity: 0;
-
-  }
-
-
-  20% {
-
-    opacity: .7;
-
-  }
-
-
-  80% {
-
-    opacity: .4;
-
-  }
-
-
-  to {
-
-    transform:
-    translateY(-110vh);
-
-    opacity: 0;
-
-  }
-
-}
-
-
-/* =========================
-   SPIDER THEME
-========================= */
-
-.spider-web {
-
-  position: fixed;
-
-  pointer-events: none;
-
-  z-index: -3;
-
-  opacity: 0;
-
-  transition:
-  opacity .6s ease;
-
-  width: 250px;
-
-  height: 250px;
-
-}
-
-
-body.spider-theme
-.spider-web {
-
-  opacity: .45;
-
-}
-
-
-.web-left {
-
-  top: 0;
-
-  left: 0;
-
-  border-radius:
-  0 0 100% 0;
-
-  background:
-
-  repeating-radial-gradient(
-
-    circle at top left,
-
-    transparent 0px,
-
-    transparent 18px,
-
-    rgba(180,30,40,.3)
-    19px,
-
-    transparent 21px
-
-  );
-
-  border-right:
-
-  1px solid
-  rgba(180,30,40,.25);
-
-  border-bottom:
-
-  1px solid
-  rgba(180,30,40,.25);
-
-}
-
-
-.web-right {
-
-  right: 0;
-
-  bottom: 0;
-
-  border-radius:
-  100% 0 0 0;
-
-  background:
-
-  repeating-radial-gradient(
-
-    circle at bottom right,
-
-    transparent 0px,
-
-    transparent 18px,
-
-    rgba(180,30,40,.3)
-    19px,
-
-    transparent 21px
-
-  );
-
-  border-left:
-
-  1px solid
-  rgba(180,30,40,.25);
-
-  border-top:
-
-  1px solid
-  rgba(180,30,40,.25);
 
 }
 
@@ -1032,335 +479,894 @@ body.galaxy-theme
 
 
 /* =========================
-   NAV
+   SATURN
 ========================= */
 
-nav {
-
-  width:
-  min(1100px,90%);
-
-  margin:
-  20px auto;
-
-  padding:
-  16px 20px;
-
-  display: flex;
-
-  justify-content:
-  space-between;
-
-  align-items:
-  center;
-
-  background:
-  transparent;
-
-  border: none;
-
-  animation:
-  navEnter
-  .8s
-  ease;
-
-}
-
-
-@keyframes navEnter {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-    translateY(-20px);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-    translateY(0);
-
-  }
-
-}
-
-
-.logo {
-
-  font-size: 18px;
-
-  font-weight: 700;
-
-  letter-spacing: .3px;
-
-}
-
-
-.logo span {
-
-  color:
-  var(--muted);
-
-  font-weight: 600;
-
-}
-
-
-/* =========================
-   MENU BUTTON
-========================= */
-
-.menu-btn {
-
-  width: 46px;
-
-  height: 46px;
-
-  border-radius: 14px;
-
-  border:
-
-  1px solid
-  var(--border);
-
-  background:
-  rgba(255,255,255,.05);
-
-  color: white;
-
-  font-size: 23px;
-
-  cursor: pointer;
-
-  transition: .3s;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-}
-
-
-.menu-btn:hover {
-
-  transform:
-  scale(1.07);
-
-  background:
-
-  rgba(
-    var(--accent-rgb),
-    .18
-  );
-
-  border-color:
-  var(--accent);
-
-}
-
-
-/* =========================
-   OVERLAY
-========================= */
-
-.menu-overlay {
+.saturn {
 
   position: fixed;
 
-  inset: 0;
+  right: -80px;
 
-  background:
-  rgba(0,0,0,.45);
+  bottom: -65px;
 
-  backdrop-filter:
-  blur(5px);
+  width: 290px;
 
-  opacity: 0;
+  height: 290px;
 
   pointer-events: none;
 
-  transition: .3s;
+  z-index: -5;
 
-  z-index: 20;
+  opacity: 0;
+
+  transform:
+  translateY(40px);
+
+  transition:
+
+  opacity .8s ease,
+
+  transform .8s ease;
 
 }
 
 
-.menu-overlay.active {
+body.galaxy-theme
+.saturn {
 
-  opacity: 1;
+  opacity: .95;
 
-  pointer-events: auto;
+  transform:
+  translateY(0);
+
+}
+
+
+/* RING BACK */
+
+.saturn-ring-back {
+
+  position: absolute;
+
+  width: 290px;
+
+  height: 95px;
+
+  left: 0;
+
+  top: 95px;
+
+  border-radius: 50%;
+
+  border:
+
+  17px solid
+  rgba(205,180,135,.7);
+
+  transform:
+  rotate(-18deg);
+
+  animation:
+  ringMove
+  7s
+  ease-in-out
+  infinite;
+
+}
+
+
+/* PLANET */
+
+.saturn-planet {
+
+  position: absolute;
+
+  width: 185px;
+
+  height: 185px;
+
+  left: 52px;
+
+  top: 52px;
+
+  border-radius: 50%;
+
+  background:
+
+  radial-gradient(
+    circle at 35% 30%,
+
+    #f4d7a1 0%,
+
+    #d4a365 30%,
+
+    #9b6739 60%,
+
+    #3d2414 100%
+  );
+
+  box-shadow:
+
+  inset
+  -25px
+  -20px
+  35px
+  rgba(0,0,0,.45),
+
+  0
+  0
+  60px
+  rgba(195,140,80,.2);
+
+}
+
+
+/* RING FRONT */
+
+.saturn-ring-front {
+
+  position: absolute;
+
+  width: 290px;
+
+  height: 95px;
+
+  left: 0;
+
+  top: 95px;
+
+  border-radius: 50%;
+
+  border:
+
+  17px solid
+  rgba(230,205,160,.8);
+
+  border-top-color:
+
+  transparent;
+
+  border-left-color:
+
+  rgba(230,205,160,.45);
+
+  transform:
+  rotate(-18deg);
+
+  animation:
+  ringMove
+  7s
+  ease-in-out
+  infinite;
+
+}
+
+
+@keyframes ringMove {
+
+  0%,
+  100% {
+
+    transform:
+    rotate(-18deg)
+    scaleX(1);
+
+  }
+
+
+  25% {
+
+    transform:
+    rotate(-15deg)
+    scaleX(.94);
+
+  }
+
+
+  50% {
+
+    transform:
+    rotate(-18deg)
+    scaleX(.86);
+
+  }
+
+
+  75% {
+
+    transform:
+    rotate(-21deg)
+    scaleX(.94);
+
+  }
 
 }
 
 
 /* =========================
-   SIDE MENU
+   SPIDER THEME
 ========================= */
 
-.side-menu {
+.spider-web {
 
   position: fixed;
 
+  pointer-events: none;
+
+  z-index: -3;
+
+  opacity: 0;
+
+  transition:
+  opacity .6s ease;
+
+  width: 250px;
+
+  height: 250px;
+
+}
+
+
+body.spider-theme
+.spider-web {
+
+  opacity: .45;
+
+}
+
+
+.web-left {
+
   top: 0;
 
-  right: -380px;
+  left: 0;
 
-  width:
-  min(360px,90%);
-
-  height: 100vh;
-
-  padding: 25px;
+  border-radius:
+  0 0 100% 0;
 
   background:
-  rgba(15,15,25,.88);
 
-  backdrop-filter:
-  blur(30px);
+  repeating-radial-gradient(
+
+    circle at top left,
+
+    transparent 0px,
+
+    transparent 18px,
+
+    rgba(180,30,40,.3)
+    19px,
+
+    transparent 21px
+
+  );
+
+  border-right:
+
+  1px solid
+  rgba(180,30,40,.25);
+
+  border-bottom:
+
+  1px solid
+  rgba(180,30,40,.25);
+
+}
+
+
+.web-right {
+
+  right: 0;
+
+  bottom: 0;
+
+  border-radius:
+  100% 0 0 0;
+
+  background:
+
+  repeating-radial-gradient(
+
+    circle at bottom right,
+
+    transparent 0px,
+
+    transparent 18px,
+
+    rgba(180,30,40,.3)
+    19px,
+
+    transparent 21px
+
+  );
 
   border-left:
 
   1px solid
-  var(--border);
+  rgba(180,30,40,.25);
 
-  z-index: 30;
+  border-top:
+
+  1px solid
+  rgba(180,30,40,.25);
+
+}
+
+
+/* SPIDER */
+
+.spider-container {
+
+  position: fixed;
+
+  top: -130px;
+
+  right: 8%;
+
+  z-index: 3;
+
+  pointer-events: none;
+
+  opacity: 0;
 
   transition:
+  opacity .6s ease;
 
-  .4s
-  cubic-bezier(
-    .2,
-    .8,
-    .2,
-    1
+}
+
+
+body.spider-theme
+.spider-container {
+
+  opacity: 1;
+
+  animation:
+
+  spiderDrop
+  8s
+  ease-in-out
+  infinite;
+
+}
+
+
+.spider-thread {
+
+  width: 1px;
+
+  height: 140px;
+
+  margin: auto;
+
+  background:
+
+  linear-gradient(
+
+    transparent,
+
+    rgba(255,255,255,.5)
+
   );
 
-  overflow-y: auto;
-
 }
 
 
-.side-menu.active {
+.spider {
 
-  right: 0;
+  width: 35px;
 
-}
+  height: 42px;
 
-
-/* =========================
-   MAIN
-========================= */
-
-main {
-
-  width:
-  min(850px,90%);
-
-  margin:
-  80px auto;
-
-  text-align: center;
+  margin: auto;
 
   position: relative;
 
 }
 
 
-/* =========================
-   TAG
-========================= */
+.spider-body {
 
-.tag {
+  position: absolute;
 
-  display:
-  inline-flex;
+  width: 22px;
 
-  align-items:
-  center;
+  height: 28px;
 
-  gap: 8px;
+  left: 7px;
 
-  padding:
-  10px 22px;
+  top: 7px;
 
-  border-radius:
-  30px;
+  border-radius: 50%;
 
   background:
-  transparent;
 
-  border:
+  radial-gradient(
 
-  1px solid
-  var(--border);
+    circle at 35% 30%,
 
-  color:
-  var(--muted);
+    #d61f2b,
 
-  font-size: 13px;
+    #49050a 70%
 
-  font-weight: 600;
+  );
 
-  letter-spacing: 3px;
+  box-shadow:
 
-  animation:
-  fadeUp
-  .7s
-  ease;
+  0 0 15px
+  rgba(180,10,20,.5);
+
+}
+
+
+.spider-body::before {
+
+  content: "";
+
+  position: absolute;
+
+  width: 10px;
+
+  height: 10px;
+
+  background: #111;
+
+  border-radius: 50%;
+
+  left: 6px;
+
+  top: -6px;
+
+}
+
+
+.spider-leg {
+
+  position: absolute;
+
+  width: 18px;
+
+  height: 2px;
+
+  background: #111;
+
+  transform-origin: left;
+
+}
+
+
+.leg1 {
+
+  top: 13px;
+
+  left: 2px;
+
+  transform:
+  rotate(-30deg);
+
+}
+
+
+.leg2 {
+
+  top: 19px;
+
+  left: 1px;
+
+  transform:
+  rotate(15deg);
+
+}
+
+
+.leg3 {
+
+  top: 13px;
+
+  right: 2px;
+
+  transform:
+  rotate(30deg);
+
+}
+
+
+.leg4 {
+
+  top: 19px;
+
+  right: 1px;
+
+  transform:
+  rotate(-15deg);
+
+}
+
+
+@keyframes spiderDrop {
+
+  0% {
+
+    transform:
+    translateY(-40px);
+
+  }
+
+
+  50% {
+
+    transform:
+    translateY(220px);
+
+  }
+
+
+  100% {
+
+    transform:
+    translateY(-40px);
+
+  }
 
 }
 
 
 /* =========================
-   TITLE
+   OCEAN THEME
 ========================= */
+
+.ocean-waves {
+
+  position: fixed;
+
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  z-index: -9;
+
+  opacity: 0;
+
+  transition:
+  opacity .7s ease;
+
+}
+
+
+body.ocean-theme
+.ocean-waves {
+
+  opacity: 1;
+
+}
+
+
+.ocean-wave {
+
+  position: absolute;
+
+  width: 180%;
+
+  height: 300px;
+
+  left: -40%;
+
+  border-radius: 45%;
+
+  background:
+
+  rgba(
+    0,
+    229,
+    255,
+    .08
+  );
+
+  filter:
+  blur(20px);
+
+  animation:
+  oceanMove
+  12s
+  ease-in-out
+  infinite;
+
+}
+
+
+.wave1 {
+
+  bottom: -150px;
+
+}
+
+
+.wave2 {
+
+  bottom: -180px;
+
+  background:
+  rgba(0,150,255,.1);
+
+  animation-delay:
+  -5s;
+
+}
+
+
+.wave3 {
+
+  bottom: -210px;
+
+  background:
+  rgba(0,255,220,.06);
+
+  animation-delay:
+  -8s;
+
+}
+
+
+@keyframes oceanMove {
+
+  0%,
+  100% {
+
+    transform:
+    translateX(-5%)
+    rotate(0deg);
+
+  }
+
+
+  50% {
+
+    transform:
+    translateX(5%)
+    rotate(3deg);
+
+  }
+
+}
+
+
+body.ocean-theme {
+
+  --accent: #00e5ff;
+
+  --accent2: #0077ff;
+
+  --accent-rgb: 0, 229, 255;
+
+  --bg: #02141c;
+
+  background:
+
+  radial-gradient(
+    circle at top left,
+    rgba(0,229,255,.2),
+    transparent 40%
+  ),
+
+  radial-gradient(
+    circle at bottom right,
+    rgba(0,119,255,.18),
+    transparent 40%
+  ),
+
+  #02141c;
+
+}
+
+
+/* =========================
+   OCEAN BUBBLES
+========================= */
+
+.ocean-bubbles {
+
+  position: fixed;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  z-index: -6;
+
+  opacity: 0;
+
+  transition:
+  opacity .6s ease;
+
+}
+
+
+body.ocean-theme
+.ocean-bubbles {
+
+  opacity: 1;
+
+}
+
+
+.bubble {
+
+  position: absolute;
+
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  border:
+
+  1px solid
+  rgba(150,255,255,.45);
+
+  box-shadow:
+
+  0 0 15px
+  rgba(0,229,255,.2);
+
+  animation:
+  bubbleRise
+  8s
+  linear
+  infinite;
+
+}
+
+
+.bubble:nth-child(1) {
+
+  left: 10%;
+  bottom: -20px;
+
+}
+
+
+.bubble:nth-child(2) {
+
+  left: 25%;
+  bottom: -40px;
+
+  width: 6px;
+  height: 6px;
+
+  animation-delay: 2s;
+
+}
+
+
+.bubble:nth-child(3) {
+
+  left: 45%;
+  bottom: -30px;
+
+  animation-delay: 4s;
+
+}
+
+
+.bubble:nth-child(4) {
+
+  left: 70%;
+  bottom: -50px;
+
+  width: 14px;
+  height: 14px;
+
+  animation-delay: 1s;
+
+}
+
+
+@keyframes bubbleRise {
+
+  0% {
+
+    transform:
+    translateY(0)
+    translateX(0);
+
+    opacity: 0;
+
+  }
+
+
+  10% {
+
+    opacity: 1;
+
+  }
+
+
+  90% {
+
+    opacity: 1;
+
+  }
+
+
+  100% {
+
+    transform:
+    translateY(-100vh)
+    translateX(20px);
+
+    opacity: 0;
+
+  }
+
+}
+
+
+/* =========================
+   MAIN STYLES
+========================= */
+
+main {
+
+  position: relative;
+
+  z-index: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-height: 100vh;
+
+  padding: 60px 20px;
+
+  text-align: center;
+
+}
+
+
+.tag {
+
+  font-size: 14px;
+
+  color: var(--muted);
+
+  margin-bottom: 20px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.2px;
+
+}
+
 
 .title {
 
-  margin:
-  28px 0 18px;
-
-  font-size:
-  clamp(
-    55px,
-    10vw,
-    100px
-  );
-
-  line-height: .9;
-
-  letter-spacing:
-  -4px;
+  font-size: 56px;
 
   font-weight: 900;
 
-  font-family:
-  Arial,
-  sans-serif;
+  margin-bottom: 15px;
 
-  text-transform:
-  uppercase;
+  background:
 
-  animation:
-
-  titleEnter
-  1s
-  cubic-bezier(
-    .2,
-    .8,
-    .2,
-    1
+  linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
   );
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
 
 }
 
@@ -1369,7 +1375,7 @@ main {
 
   display: block;
 
-  color: white;
+  font-size: 48px;
 
 }
 
@@ -1378,217 +1384,81 @@ main {
 
   display: block;
 
-  margin-top: 10px;
-
-  color: white;
-
-}
-
-
-@keyframes titleEnter {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-
-    translateY(40px)
-
-    scale(.95);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-
-    translateY(0)
-
-    scale(1);
-
-  }
-
-}
-
-
-@keyframes fadeUp {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-    translateY(20px);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-    translateY(0);
-
-  }
+  font-size: 48px;
 
 }
 
 
 .description {
 
-  color:
-  var(--muted);
+  font-size: 18px;
 
-  line-height: 1.7;
+  color: var(--muted);
 
-  font-size: 17px;
+  margin-bottom: 45px;
+
+  max-width: 600px;
 
 }
 
-
-/* =========================
-   CONVERTER
-========================= */
 
 .converter {
 
-  margin-top: 50px;
+  width: 100%;
 
-  padding: 30px;
+  max-width: 600px;
+
+  padding: 40px;
 
   background:
-
-  linear-gradient(
-
-    145deg,
-
-    rgba(255,255,255,.09),
-
-    rgba(255,255,255,.035)
-
-  );
-
-  backdrop-filter:
-  blur(35px);
+  var(--glass);
 
   border:
-
   1px solid
   var(--border);
 
-  border-radius:
-  30px;
+  border-radius: 16px;
 
-  box-shadow:
-
-  0
-  25px
-  80px
-  rgba(0,0,0,.25);
-
-}
-
-
-/* =========================
-   FORMAT SWITCH
-========================= */
-
-.format-switch {
+  backdrop-filter: blur(10px);
 
   display: flex;
 
-  gap: 10px;
+  flex-direction: column;
 
-  padding: 8px;
-
-  width: 100%;
-
-  margin:
-  0 0 25px;
-
-  border-radius:
-  20px;
-
-  background:
-  rgba(0,0,0,.2);
-
-  border:
-
-  1px solid
-  var(--border);
-
-}
-
-
-.format-btn {
-
-  flex: 1;
-
-  border: none;
-
-  background:
-  transparent;
-
-  color:
-  var(--muted);
-
-  padding:
-  16px 24px;
-
-  border-radius:
-  15px;
-
-  font-size: 16px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition: .35s;
-
-}
-
-
-.format-btn.active {
-
-  color: white;
-
-  background:
-
-  linear-gradient(
-
-    135deg,
-
-    var(--accent),
-
-    var(--accent2)
-
-  );
-
-  box-shadow:
-
-  0
-  8px
-  30px
-
-  rgba(
-    var(--accent-rgb),
-    .3
-  );
+  gap: 20px;
 
 }
 
 
 /* =========================
-   URL BOX
+   MEDIA URL SECTION
 ========================= */
 
-.url-box {
+.media-url-section {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+
+}
+
+
+.media-url-label {
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: var(--text);
+
+  text-align: left;
+
+}
+
+
+.url-input-wrapper {
 
   display: flex;
 
@@ -1601,44 +1471,185 @@ main {
 
   flex: 1;
 
-  padding: 20px;
+  padding: 14px 16px;
 
-  border-radius:
-  20px;
+  background:
+  rgba(255, 255, 255, 0.03);
 
   border:
-
   1px solid
   var(--border);
 
-  background:
-  rgba(255,255,255,.06);
+  color: var(--text);
 
-  color: white;
+  border-radius: 10px;
+
+  font-size: 15px;
 
   outline: none;
 
-  font-size: 16px;
+  transition: all .3s ease;
 
 }
 
 
 .url-input:focus {
 
+  background:
+  rgba(255, 255, 255, 0.06);
+
   border-color:
   var(--accent);
 
   box-shadow:
 
-  0
-  0
-  0
-  4px
+  0 0 12px
+  rgba(var(--accent-rgb), 0.3);
+
+}
+
+
+.url-input::placeholder {
+
+  color:
+  rgba(var(--text), 0.4);
+
+}
+
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.action-buttons {
+
+  display: flex;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+
+}
+
+
+.action-btn {
+
+  flex: 1;
+
+  min-width: 90px;
+
+  padding: 12px 16px;
+
+  background:
+  rgba(255, 255, 255, 0.05);
+
+  border:
+  1px solid
+  var(--border);
+
+  color: var(--muted);
+
+  border-radius: 10px;
+
+  font-weight: 600;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition: all .3s ease;
+
+}
+
+
+.action-btn:hover {
+
+  background:
 
   rgba(
     var(--accent-rgb),
-    .1
+    .15
   );
+
+  border-color:
+  var(--accent);
+
+  color: white;
+
+}
+
+
+/* =========================
+   FORMAT SWITCH
+========================= */
+
+.format-switch {
+
+  display: flex;
+
+  gap: 12px;
+
+  background:
+  rgba(0, 0, 0, 0.3);
+
+  padding: 6px;
+
+  border-radius: 10px;
+
+}
+
+
+.format-btn {
+
+  flex: 1;
+
+  padding: 12px 16px;
+
+  background: transparent;
+
+  color: var(--text);
+
+  border: none;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+
+  all .3s ease;
+
+}
+
+
+.format-btn:hover {
+
+  background:
+  rgba(255, 255, 255, 0.05);
+
+}
+
+
+.format-btn.active {
+
+  background:
+
+  linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
+
+  color: #fff;
+
+  box-shadow:
+
+  0 4px 15px
+  rgba(var(--accent-rgb), 0.4);
 
 }
 
@@ -1649,29 +1660,21 @@ main {
 
 .download-btn {
 
-  min-width: 150px;
-
-  padding:
-  20px 25px;
-
-  border: none;
-
-  border-radius:
-  20px;
+  padding: 16px 28px;
 
   background:
 
   linear-gradient(
-
     135deg,
-
     var(--accent),
-
     var(--accent2)
-
   );
 
-  color: white;
+  color: #fff;
+
+  border: none;
+
+  border-radius: 10px;
 
   font-weight: 700;
 
@@ -1679,34 +1682,34 @@ main {
 
   cursor: pointer;
 
-  transition: .3s;
+  transition:
+
+  all .3s ease;
+
+  width: 100%;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
 
 }
 
 
 .download-btn:hover {
 
-  transform:
-  translateY(-3px);
+  transform: translateY(-2px);
 
   box-shadow:
 
-  0
-  15px
-  40px
-
-  rgba(
-    var(--accent-rgb),
-    .35
-  );
+  0 8px 20px
+  rgba(var(--accent-rgb), 0.4);
 
 }
 
 
 .download-btn:active {
 
-  transform:
-  translateY(-1px);
+  transform: translateY(0);
 
 }
 
@@ -1732,27 +1735,16 @@ main {
 
   align-items: center;
 
-  justify-content:
-  center;
+  gap: 15px;
 
-  gap: 20px;
-
-  padding: 25px;
-
-  margin-top: 25px;
+  padding: 20px;
 
   background:
-  rgba(0,0,0,.2);
+  rgba(0, 0, 0, 0.2);
 
-  border:
+  border-radius: 10px;
 
-  1px solid
-  var(--border);
-
-  border-radius:
-  20px;
-
-  min-height: 100px;
+  min-height: 80px;
 
 }
 
@@ -1761,18 +1753,14 @@ main {
 
   display: none;
 
-  width: 50px;
+  width: 40px;
 
-  height: 50px;
+  height: 40px;
 
   border:
 
   3px solid
-
-  rgba(
-    var(--accent-rgb),
-    .25
-  );
+  rgba(var(--accent-rgb), 0.3);
 
   border-top-color:
   var(--accent);
@@ -1780,7 +1768,8 @@ main {
   border-radius: 50%;
 
   animation:
-  spin .8s
+
+  spin .6s
   linear
   infinite;
 
@@ -1801,7 +1790,7 @@ main {
 
 .status-text {
 
-  font-size: 15px;
+  font-size: 14px;
 
   color: var(--muted);
 
@@ -1820,8 +1809,6 @@ main {
   rgba(var(--text), 0.5);
 
   text-align: center;
-
-  margin-top: 20px;
 
 }
 
@@ -1848,51 +1835,384 @@ footer {
 
 
 /* =========================
-   LIST OPTIONS
+   MENU
 ========================= */
 
-.list-option {
+.menu-btn {
 
-  width: 100%;
+  background: none;
 
-  padding: 17px;
+  border: none;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  color: var(--text);
+
+}
+
+
+nav {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  right: 0;
 
   display: flex;
 
+  justify-content: space-between;
+
   align-items: center;
 
-  gap: 14px;
+  padding: 20px 30px;
 
-  border-radius: 15px;
+  background:
+  rgba(0, 0, 0, 0.5);
 
-  border:
+  backdrop-filter: blur(10px);
+
+  border-bottom:
 
   1px solid
   var(--border);
 
-  background:
-  rgba(255,255,255,.05);
+  z-index: 100;
 
-  color: white;
+}
+
+
+.logo {
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  background:
+
+  linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+}
+
+
+.logo span {
+
+  letter-spacing: 2px;
+
+}
+
+
+.side-menu {
+
+  position: fixed;
+
+  left: 0;
+
+  top: 0;
+
+  width: 250px;
+
+  height: 100vh;
+
+  background:
+  rgba(0, 0, 0, 0.8);
+
+  backdrop-filter: blur(10px);
+
+  border-right:
+
+  1px solid
+  var(--border);
+
+  z-index: 200;
+
+  transform: translateX(-100%);
+
+  transition:
+  transform .3s ease;
+
+  display: flex;
+
+  flex-direction: column;
+
+  padding: 80px 20px 20px;
+
+  gap: 10px;
+
+  overflow-y: auto;
+
+}
+
+
+.side-menu.active {
+
+  transform: translateX(0);
+
+}
+
+
+.menu-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0);
+
+  z-index: 150;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition:
+
+  background .3s ease,
+
+  opacity .3s ease;
+
+}
+
+
+.menu-overlay.active {
+
+  background: rgba(0, 0, 0, 0.5);
+
+  opacity: 1;
+
+  pointer-events: auto;
+
+}
+
+
+.menu-title {
 
   font-size: 16px;
 
+  font-weight: 700;
+
+  color: white;
+
+  margin: 20px 0 15px;
+
+  padding-left: 10px;
+
+}
+
+
+.menu-title:first-child {
+
+  margin-top: 0;
+
+}
+
+
+.list-option {
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--text);
+
+  padding: 12px 16px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
   cursor: pointer;
 
-  transition: .3s;
+  transition:
+  all .3s ease;
 
-  margin-bottom: 12px;
+  text-align: left;
 
 }
 
 
 .list-option:hover {
 
-  transform:
-  translateX(5px);
+  background:
+  rgba(var(--accent-rgb), 0.1);
+
+}
+
+
+.theme-grid {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+}
+
+
+.theme-box {
+
+  background:
+  rgba(255,255,255,.06);
+
+  border:
+
+  1px solid
+  var(--border);
+
+  padding: 20px;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition:
+  all .3s ease;
+
+  text-align: center;
+
+}
+
+
+.theme-box:hover {
 
   border-color:
   var(--accent);
+
+  transform:
+  translateY(-3px);
+
+  box-shadow:
+
+  0 8px 20px
+  rgba(var(--accent-rgb), 0.2);
+
+}
+
+
+.theme-name {
+
+  font-weight: 700;
+
+  font-size: 15px;
+
+  color: white;
+
+  margin-bottom: 8px;
+
+}
+
+
+.theme-desc {
+
+  font-size: 12px;
+
+  color: var(--muted);
+
+}
+
+
+.color-grid {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+}
+
+
+.color-box {
+
+  background:
+  rgba(255,255,255,.06);
+
+  border:
+
+  1px solid
+  var(--border);
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition:
+  all .3s ease;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+}
+
+
+.color-box:hover {
+
+  border-color:
+  var(--accent);
+
+  transform:
+  translateY(-2px);
+
+}
+
+
+.color-dot {
+
+  width: 20px;
+
+  height: 20px;
+
+  border-radius: 50%;
+
+}
+
+
+.color-label {
+
+  font-weight: 600;
+
+  font-size: 14px;
+
+  color: white;
+
+}
+
+
+.back-btn {
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--text);
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  padding: 10px;
+
+  margin-bottom: 20px;
 
 }
 
@@ -1905,29 +2225,55 @@ footer {
 
   main {
 
-    margin: 100px auto 60px;
+    padding: 80px 20px 60px;
 
   }
 
+
   .title {
+
+    font-size: 40px;
+
+  }
+
+
+  .title .download,
+  .title .videos {
 
     font-size: 36px;
 
   }
 
-  .converter {
 
-    padding: 20px;
+  .description {
+
+    font-size: 16px;
+
+    margin-bottom: 30px;
 
   }
 
-  .url-box {
+
+  .converter {
+
+    padding: 30px 20px;
+
+  }
+
+
+  .url-input-wrapper {
 
     flex-direction: column;
 
   }
 
-  .download-btn {
+  .action-buttons {
+
+    flex-direction: column;
+
+  }
+
+  .action-btn {
 
     width: 100%;
 
@@ -1946,9 +2292,6 @@ footer {
   <div class="blob blob2"></div>
 </div>
 
-<div class="ambient-stars"></div>
-<div class="ambient-glow"></div>
-
 <div class="galaxy-stars"></div>
 
 <div class="sparkles">
@@ -1958,6 +2301,12 @@ footer {
   <div class="sparkle"></div>
   <div class="sparkle"></div>
   <div class="sparkle"></div>
+</div>
+
+<div class="saturn">
+  <div class="saturn-ring-back"></div>
+  <div class="saturn-planet"></div>
+  <div class="saturn-ring-front"></div>
 </div>
 
 <div class="ocean-waves">
@@ -1976,32 +2325,114 @@ footer {
 <div class="spider-web web-left"></div>
 <div class="spider-web web-right"></div>
 
+<div class="spider-container">
+  <div class="spider-thread"></div>
+  <div class="spider">
+    <div class="spider-body">
+      <div class="spider-leg leg1"></div>
+      <div class="spider-leg leg2"></div>
+      <div class="spider-leg leg3"></div>
+      <div class="spider-leg leg4"></div>
+    </div>
+  </div>
+</div>
+
 <!-- MENU OVERLAY -->
 <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
 
 <!-- SIDE MENU -->
 <div class="side-menu" id="sideMenu">
-  <div style="flex: 1;"></div>
+  <button class="back-btn" onclick="goBack()">←</button>
 
-  <button class="list-option" onclick="setTheme('default')">
-    ✨ Default Theme
-  </button>
+  <div id="mainMenu">
+    <div class="menu-title">Settings</div>
 
-  <button class="list-option" onclick="setTheme('ocean')">
-    🌊 Ocean Theme
-  </button>
+    <button class="list-option" onclick="openColours()">
+      🎨 Colours
+    </button>
 
-  <button class="list-option" onclick="setTheme('galaxy')">
-    🌌 Galaxy Theme
-  </button>
+    <button class="list-option" onclick="openThemes()">
+      ✨ Themes
+    </button>
+  </div>
 
-  <button class="list-option" onclick="setTheme('spider')">
-    🕷️ Spider Theme
-  </button>
+  <div id="coloursMenu" style="display: none;">
+    <div class="color-grid">
+      <div class="color-box" onclick="setColour('#8b5cf6', '#4f46e5', '139, 92, 246')">
+        <div class="color-dot" style="background: #8b5cf6;"></div>
+        <span class="color-label">Purple</span>
+      </div>
 
-  <button class="list-option" onclick="setTheme('dark')">
-    🌙 Dark Theme
-  </button>
+      <div class="color-box" onclick="setColour('#ef4444', '#dc2626', '239, 68, 68')">
+        <div class="color-dot" style="background: #ef4444;"></div>
+        <span class="color-label">Red</span>
+      </div>
+
+      <div class="color-box" onclick="setColour('#3b82f6', '#1d4ed8', '59, 130, 246')">
+        <div class="color-dot" style="background: #3b82f6;"></div>
+        <span class="color-label">Blue</span>
+      </div>
+
+      <div class="color-box" onclick="setColour('#10b981', '#059669', '16, 185, 129')">
+        <div class="color-dot" style="background: #10b981;"></div>
+        <span class="color-label">Green</span>
+      </div>
+
+      <div class="color-box" onclick="setColour('#ec4899', '#be185d', '236, 72, 153')">
+        <div class="color-dot" style="background: #ec4899;"></div>
+        <span class="color-label">Pink</span>
+      </div>
+
+      <div class="color-box" onclick="setColour('#00fff2', '#ff2bd6', '0, 255, 242')">
+        <div class="color-dot" style="background: #00fff2;"></div>
+        <span class="color-label">Cyber</span>
+      </div>
+
+      <div class="color-box" onclick="setColour('#f97316', '#ea580c', '249, 115, 22')">
+        <div class="color-dot" style="background: #f97316;"></div>
+        <span class="color-label">Orange</span>
+      </div>
+
+      <div class="color-box" onclick="setColour('#eab308', '#ca8a04', '234, 179, 8')">
+        <div class="color-dot" style="background: #eab308;"></div>
+        <span class="color-label">Gold</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="themesMenu" style="display: none;">
+    <div class="theme-grid">
+      <div class="theme-box" onclick="setTheme('default')">
+        <div class="theme-name">Default</div>
+        <div class="theme-desc">Fast, simple, clean</div>
+      </div>
+
+      <div class="theme-box" onclick="setTheme('dark')">
+        <div class="theme-name">Dark</div>
+        <div class="theme-desc">Calm midnight glow</div>
+      </div>
+
+      <div class="theme-box" onclick="setTheme('cyber')">
+        <div class="theme-name">Cyberpunk</div>
+        <div class="theme-desc">Neon night city</div>
+      </div>
+
+      <div class="theme-box" onclick="setTheme('galaxy')">
+        <div class="theme-name">Galaxy</div>
+        <div class="theme-desc">Deep space stars</div>
+      </div>
+
+      <div class="theme-box" onclick="setTheme('ocean')">
+        <div class="theme-name">Ocean</div>
+        <div class="theme-desc">Underwater calm</div>
+      </div>
+
+      <div class="theme-box" onclick="setTheme('spider')">
+        <div class="theme-name">Spider</div>
+        <div class="theme-desc">Web-slinger vibes</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- NAV -->
@@ -2023,40 +2454,53 @@ footer {
   </div>
 
   <h1 class="title">
-    <span class="download">Download</span>
-    <span class="videos">Videos</span>
+    <span class="download">EXTRACT</span>
+    <span class="videos">ANYTHING</span>
   </h1>
 
   <p class="description">
-    Download YouTube videos, TikTok, Instagram or convert
-    your media into MP3 audio.
+    Paste a supported media URL and download
+    your media in the format you need.
   </p>
 
   <!-- CONVERTER -->
   <div class="converter">
 
-    <!-- FORMAT SWITCH -->
-    <div class="format-switch">
-      <button class="format-btn active" id="mp4Btn" onclick="setFormat('mp4')">
-        🎬 MP4
-      </button>
-      <button class="format-btn" id="mp3Btn" onclick="setFormat('mp3')">
-        🎵 MP3
-      </button>
+    <!-- MEDIA URL SECTION -->
+    <div class="media-url-section">
+      <label class="media-url-label">Media URL</label>
+      <div class="url-input-wrapper">
+        <input
+          id="urlInput"
+          class="url-input"
+          type="url"
+          placeholder="Paste direct media URL..."
+        >
+      </div>
+      <div class="action-buttons">
+        <button class="action-btn" onclick="pasteURL()">Paste</button>
+        <button class="action-btn" onclick="clearURL()">Clear</button>
+        <button class="action-btn" onclick="refreshPage()">Refresh</button>
+      </div>
     </div>
 
-    <!-- URL INPUT -->
-    <div class="url-box">
-      <input
-        id="urlInput"
-        class="url-input"
-        type="url"
-        placeholder="Paste YouTube or media URL..."
-      >
-      <button class="download-btn" id="downloadBtn" onclick="downloadMedia()">
-        Download
-      </button>
+    <!-- OUTPUT FORMAT -->
+    <div>
+      <div style="font-size: 14px; font-weight: 600; color: var(--text); text-align: left; margin-bottom: 10px;">Output Format</div>
+      <div class="format-switch">
+        <button class="format-btn active" id="mp4Btn" onclick="setFormat('mp4')">
+          🎬 MP4
+        </button>
+        <button class="format-btn" id="mp3Btn" onclick="setFormat('mp3')">
+          🎵 MP3
+        </button>
+      </div>
     </div>
+
+    <!-- DOWNLOAD BUTTON -->
+    <button class="download-btn" id="downloadBtn" onclick="downloadMedia()">
+      DOWNLOAD MP4
+    </button>
 
     <!-- STATUS -->
     <div id="statusBox" class="status-box">
@@ -2067,7 +2511,7 @@ footer {
     </div>
 
     <div class="info" id="infoText">
-      Supports YouTube, TikTok, Instagram, and direct media file URLs.
+      Supports publicly accessible direct media file URLs.
     </div>
 
   </div>
@@ -2091,15 +2535,26 @@ function closeMenu() {
   document.getElementById("menuOverlay").classList.remove("active");
 }
 
+function goBack() {
+  document.getElementById("mainMenu").style.display = "block";
+  document.getElementById("coloursMenu").style.display = "none";
+  document.getElementById("themesMenu").style.display = "none";
+}
+
+function openColours() {
+  document.getElementById("mainMenu").style.display = "none";
+  document.getElementById("coloursMenu").style.display = "grid";
+}
+
+function openThemes() {
+  document.getElementById("mainMenu").style.display = "none";
+  document.getElementById("themesMenu").style.display = "grid";
+}
+
 /* THEME */
 function setTheme(theme) {
   const body = document.body;
-  body.classList.remove(
-    "ocean-theme",
-    "galaxy-theme",
-    "spider-theme",
-    "dark-theme"
-  );
+  body.classList.remove("ocean-theme", "galaxy-theme", "spider-theme", "dark-theme", "cyber-theme");
 
   if (theme === "ocean") {
     body.classList.add("ocean-theme");
@@ -2109,8 +2564,19 @@ function setTheme(theme) {
     body.classList.add("spider-theme");
   } else if (theme === "dark") {
     body.classList.add("dark-theme");
+  } else if (theme === "cyber") {
+    body.classList.add("cyber-theme");
   }
 
+  closeMenu();
+}
+
+/* COLOUR */
+function setColour(accent, accent2, accentRgb) {
+  const root = document.documentElement;
+  root.style.setProperty("--accent", accent);
+  root.style.setProperty("--accent2", accent2);
+  root.style.setProperty("--accent-rgb", accentRgb);
   closeMenu();
 }
 
@@ -2122,23 +2588,41 @@ function setFormat(format) {
 
   const mp4Btn = document.getElementById("mp4Btn");
   const mp3Btn = document.getElementById("mp3Btn");
-  const input = document.getElementById("urlInput");
   const button = document.getElementById("downloadBtn");
-  const info = document.getElementById("infoText");
 
   if (format === "mp3") {
     mp3Btn.classList.add("active");
     mp4Btn.classList.remove("active");
-
-    button.innerText = "Convert to MP3";
-    info.innerText = "Audio will be extracted and converted to MP3.";
+    button.innerText = "CONVERT TO MP3";
   } else {
     mp4Btn.classList.add("active");
     mp3Btn.classList.remove("active");
-
-    button.innerText = "Download";
-    info.innerText = "Supports YouTube, TikTok, Instagram, and direct media file URLs.";
+    button.innerText = "DOWNLOAD MP4";
   }
+}
+
+/* ACTIONS */
+function pasteURL() {
+  navigator.clipboard.read().then(async (items) => {
+    for (let item of items) {
+      for (let type of item.types) {
+        if (type === "text/plain") {
+          const text = await item.getType("text/plain");
+          const url = await text.text();
+          document.getElementById("urlInput").value = url;
+          return;
+        }
+      }
+    }
+  }).catch(() => alert("Unable to paste from clipboard"));
+}
+
+function clearURL() {
+  document.getElementById("urlInput").value = "";
+}
+
+function refreshPage() {
+  location.reload();
 }
 
 /* DOWNLOAD */
