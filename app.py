@@ -155,29 +155,43 @@ def build_ydl_options(url, temp_dir, audio_only, format_override=None):
 
         # Network resilience — YouTube/Instagram both throw transient
         # errors fairly often; retry instead of failing immediately.
-        "retries": 5,
-        "fragment_retries": 5,
-        "socket_timeout": 30,
-        "extractor_retries": 3,
+        "retries": 10,
+        "fragment_retries": 10,
+        "socket_timeout": 60,
+        "extractor_retries": 5,
+        "file_access_retries": 5,
 
-        # A modern browser UA + player client selection is what avoids
-        # YouTube's "Sign in to confirm you're not a bot" error on
-        # datacenter IPs (Render/Railway/etc.) in most cases.
+        # Enhanced anti-bot headers: realistic browser fingerprint
         "http_headers": {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/124.0.0.0 Safari/537.36"
-            )
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate",
+            "DNT": "1",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1"
         },
+
+        # Try multiple player clients to bypass bot detection
         "extractor_args": {
             "youtube": {
-                # android/ios clients currently bypass most bot checks
-                # without needing cookies. If this stops working in the
-                # future, add a YouTube cookies file as a fallback.
-                "player_client": ["android", "web"],
+                # Use multiple clients; yt-dlp will try them in order
+                # android/ios clients often bypass bot checks better than web
+                "player_client": ["android", "web", "ios"],
             }
         },
+
+        # Additional options to avoid being blocked
+        "quiet": False,
+        "no_color": False,
+        "progress": True,
+        "progress_template": "%(progress.total_size)s at %(progress._speed_str)s",
+        "geo_bypass": True,
+        "geo_bypass_country": "US",
+        "check_fragments": True,
     }
 
     cookies_file = pick_cookies_file(url)
@@ -369,4 +383,3 @@ def convert_mp3():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-    
