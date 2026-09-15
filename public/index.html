@@ -999,1866 +999,109 @@ body.ocean-theme
 }
 
 
-.bubble:nth-child(5) {
-
-  left: 88%;
-  bottom: -30px;
-
-  width: 7px;
-  height: 7px;
-
-  animation-delay: 5s;
-
-}
-
-
 @keyframes bubbleRise {
 
-  from {
+  0% {
 
     transform:
-    translateY(0);
+    translateY(0)
+    translateX(0);
 
     opacity: 0;
 
   }
 
 
-  20% {
+  10% {
 
-    opacity: .7;
-
-  }
-
-
-  80% {
-
-    opacity: .4;
+    opacity: 1;
 
   }
 
 
-  to {
+  90% {
+
+    opacity: 1;
+
+  }
+
+
+  100% {
 
     transform:
-    translateY(-110vh);
+    translateY(-100vh)
+    translateX(20px);
 
     opacity: 0;
 
   }
 
 }
-  /* =========================
-   SPIDER
+
+
+/* =========================
+   MAIN STYLES
 ========================= */
 
-.spider-container {
-
-  position: fixed;
-
-  top: -130px;
-
-  right: 8%;
-
-  z-index: 3;
-
-  pointer-events: none;
-
-  opacity: 0;
-
-  transition:
-  opacity .6s ease;
-
-}
-
-
-body.spider-theme
-.spider-container {
-
-  opacity: 1;
-
-  animation:
-
-  spiderDrop
-  8s
-  ease-in-out
-  infinite;
-
-}
-
-
-.spider-thread {
-
-  width: 1px;
-
-  height: 140px;
-
-  margin: auto;
-
-  background:
-
-  linear-gradient(
-
-    transparent,
-
-    rgba(255,255,255,.5)
-
-  );
-
-}
-
-
-.spider {
-
-  width: 35px;
-
-  height: 42px;
-
-  margin: auto;
+main {
 
   position: relative;
 
-}
-
-
-.spider-body {
-
-  position: absolute;
-
-  width: 22px;
-
-  height: 28px;
-
-  left: 7px;
-
-  top: 7px;
-
-  border-radius: 50%;
-
-  background:
-
-  radial-gradient(
-
-    circle at 35% 30%,
-
-    #d61f2b,
-
-    #49050a 70%
-
-  );
-
-  box-shadow:
-
-  0 0 15px
-  rgba(180,10,20,.5);
-
-}
-
-
-.spider-body::before {
-
-  content: "";
-
-  position: absolute;
-
-  width: 10px;
-
-  height: 10px;
-
-  background: #111;
-
-  border-radius: 50%;
-
-  left: 6px;
-
-  top: -6px;
-
-}
-
-
-.spider-leg {
-
-  position: absolute;
-
-  width: 18px;
-
-  height: 2px;
-
-  background: #111;
-
-  transform-origin: left;
-
-}
-
-
-.leg1 {
-
-  top: 13px;
-
-  left: 2px;
-
-  transform:
-  rotate(-30deg);
-
-}
-
-
-.leg2 {
-
-  top: 19px;
-
-  left: 1px;
-
-  transform:
-  rotate(15deg);
-
-}
-
-
-.leg3 {
-
-  top: 13px;
-
-  right: 2px;
-
-  transform:
-  rotate(30deg);
-
-}
-
-
-.leg4 {
-
-  top: 19px;
-
-  right: 1px;
-
-  transform:
-  rotate(-15deg);
-
-}
-
-
-@keyframes spiderDrop {
-
-  0% {
-
-    transform:
-    translateY(-40px);
-
-  }
-
-
-  50% {
-
-    transform:
-    translateY(220px);
-
-  }
-
-
-  100% {
-
-    transform:
-    translateY(-40px);
-
-  }
-
-}
-/* =========================
-   HALLOWEEN DARK THEME
-========================= */
-
-.halloween-scene {
-
-  position: fixed;
-
-  inset: 0;
-
-  pointer-events: none;
-
-  overflow: hidden;
-
-  z-index: -4;
-
-  opacity: 0;
-
-  transition:
-  opacity .8s ease;
-
-}
-
-
-body.dark-theme
-.halloween-scene {
-
-  opacity: 1;
-
-}
-
-
-/* =========================
-   DARK BACKGROUND
-========================= */
-
-body.dark-theme {
-
-  --accent: #a855f7;
-
-  --accent2: #5b21b6;
-
-  --accent-rgb:
-  168, 85, 247;
-
-  --bg:
-  #08040f;
-
-  background:
-
-  radial-gradient(
-    circle at 75% 15%,
-    rgba(130,70,255,.16),
-    transparent 28%
-  ),
-
-  radial-gradient(
-    circle at 20% 80%,
-    rgba(100,20,120,.12),
-    transparent 35%
-  ),
-
-  linear-gradient(
-    180deg,
-    #07030d,
-    #0d0615,
-    #050308
-  );
-
-}
-
-
-/* =========================
-   MOON
-========================= */
-
-.halloween-moon {
-
-  position: absolute;
-
-  width: 180px;
-
-  height: 180px;
-
-  top: 70px;
-
-  right: 10%;
-
-  border-radius: 50%;
-
-  background:
-
-  radial-gradient(
-    circle at 35% 30%,
-
-    #ffffff 0%,
-
-    #f1e9ff 35%,
-
-    #cbb8e8 70%,
-
-    #9b82c5 100%
-  );
-
-  box-shadow:
-
-  0 0 30px
-  rgba(220,190,255,.7),
-
-  0 0 80px
-  rgba(150,80,255,.35),
-
-  0 0 150px
-  rgba(100,30,180,.2);
-
-  animation:
-
-  moonGlow
-  5s
-  ease-in-out
-  infinite;
-
-}
-
-
-@keyframes moonGlow {
-
-  0%,
-  100% {
-
-    transform:
-    scale(1);
-
-    box-shadow:
-
-    0 0 30px
-    rgba(220,190,255,.7),
-
-    0 0 80px
-    rgba(150,80,255,.35);
-
-  }
-
-
-  50% {
-
-    transform:
-    scale(1.04);
-
-    box-shadow:
-
-    0 0 45px
-    rgba(230,210,255,.9),
-
-    0 0 110px
-    rgba(150,80,255,.5);
-
-  }
-
-}
-
-
-/* =========================
-   MOON CRATERS
-========================= */
-
-.moon-crater {
-
-  position: absolute;
-
-  border-radius: 50%;
-
-  background:
-  rgba(100,70,140,.18);
-
-}
-
-
-.crater1 {
-
-  width: 28px;
-
-  height: 18px;
-
-  top: 45px;
-
-  left: 45px;
-
-}
-
-
-.crater2 {
-
-  width: 18px;
-
-  height: 25px;
-
-  top: 95px;
-
-  right: 40px;
-
-}
-
-
-.crater3 {
-
-  width: 13px;
-
-  height: 13px;
-
-  bottom: 40px;
-
-  left: 70px;
-
-}
-
-
-/* =========================
-   STARS
-========================= */
-
-.halloween-stars {
-
-  position: absolute;
-
-  inset: 0;
-
-  background-image:
-
-  radial-gradient(
-    circle,
-    rgba(255,255,255,.8) 1px,
-    transparent 1.5px
-  ),
-
-  radial-gradient(
-    circle,
-    rgba(180,130,255,.7) 1px,
-    transparent 1.5px
-  );
-
-  background-size:
-
-  110px 110px,
-
-  170px 170px;
-
-  opacity: .4;
-
-  animation:
-
-  halloweenStars
-  20s
-  linear
-  infinite;
-
-}
-
-
-@keyframes halloweenStars {
-
-  from {
-
-    background-position:
-
-    0 0,
-
-    50px 40px;
-
-  }
-
-
-  to {
-
-    background-position:
-
-    110px 130px,
-
-    220px 200px;
-
-  }
-
-}
-
-
-/* =========================
-   FOG
-========================= */
-
-.halloween-fog {
-
-  position: absolute;
-
-  width: 180%;
-
-  height: 250px;
-
-  left: -40%;
-
-  bottom: -100px;
-
-  background:
-
-  radial-gradient(
-    ellipse,
-    rgba(130,90,160,.12),
-    transparent 65%
-  );
-
-  filter:
-  blur(35px);
-
-  animation:
-
-  fogMove
-  18s
-  ease-in-out
-  infinite;
-
-}
-
-
-.fog2 {
-
-  bottom: 20px;
-
-  opacity: .6;
-
-  animation-delay:
-  -8s;
-
-}
-
-
-@keyframes fogMove {
-
-  0%,
-  100% {
-
-    transform:
-    translateX(-5%);
-
-  }
-
-
-  50% {
-
-    transform:
-    translateX(8%);
-
-  }
-
-}
-
-
-/* =========================
-   WITCH
-========================= */
-
-.halloween-witch {
-
-  position: absolute;
-
-  top: 170px;
-
-  right: -200px;
-
-  font-size: 58px;
-
-  filter:
-
-  drop-shadow(
-    0 0 12px
-    rgba(130,60,255,.8)
-  );
-
-  animation:
-
-  witchFly
-  16s
-  linear
-  infinite;
-
-}
-
-
-@keyframes witchFly {
-
-  0% {
-
-    transform:
-
-    translateX(0)
-
-    translateY(0)
-
-    rotate(-5deg);
-
-  }
-
-
-  25% {
-
-    transform:
-
-    translateX(-35vw)
-
-    translateY(-25px)
-
-    rotate(4deg);
-
-  }
-
-
-  50% {
-
-    transform:
-
-    translateX(-70vw)
-
-    translateY(15px)
-
-    rotate(-3deg);
-
-  }
-
-
-  75% {
-
-    transform:
-
-    translateX(-105vw)
-
-    translateY(-15px)
-
-    rotate(5deg);
-
-  }
-
-
-  100% {
-
-    transform:
-
-    translateX(-140vw)
-
-    translateY(0)
-
-    rotate(-5deg);
-
-  }
-
-}
-
-
-/* =========================
-   BATS
-========================= */
-
-.halloween-bat {
-
-  position: absolute;
-
-  font-size: 28px;
-
-  color:
-  #1b1025;
-
-  text-shadow:
-
-  0 0 8px
-  rgba(120,50,180,.4);
-
-  animation:
-
-  batFly
-  7s
-  ease-in-out
-  infinite;
-
-}
-
-
-.bat1 {
-
-  top: 120px;
-
-  left: 10%;
-
-}
-
-
-.bat2 {
-
-  top: 260px;
-
-  left: 25%;
-
-  font-size: 20px;
-
-  animation-delay:
-  -2s;
-
-}
-
-
-.bat3 {
-
-  top: 180px;
-
-  left: 55%;
-
-  font-size: 24px;
-
-  animation-delay:
-  -4s;
-
-}
-
-
-.bat4 {
-
-  top: 350px;
-
-  left: 75%;
-
-  font-size: 18px;
-
-  animation-delay:
-  -1s;
-
-}
-
-
-@keyframes batFly {
-
-  0%,
-  100% {
-
-    transform:
-
-    translate(0,0)
-
-    rotate(-8deg);
-
-  }
-
-
-  25% {
-
-    transform:
-
-    translate(35px,-18px)
-
-    rotate(8deg);
-
-  }
-
-
-  50% {
-
-    transform:
-
-    translate(70px,8px)
-
-    rotate(-5deg);
-
-  }
-
-
-  75% {
-
-    transform:
-
-    translate(30px,25px)
-
-    rotate(7deg);
-
-  }
-
-}
-
-
-/* =========================
-   HAUNTED CASTLE
-========================= */
-
-.haunted-castle {
-
-  position: absolute;
-
-  bottom: -5px;
-
-  left: 50%;
-
-  transform:
-  translateX(-50%);
-
-  width: 450px;
-
-  height: 180px;
-
-  opacity: .65;
-
-}
-
-
-.castle-base {
-
-  position: absolute;
-
-  bottom: 0;
-
-  left: 50px;
-
-  width: 350px;
-
-  height: 100px;
-
-  background:
-
-  linear-gradient(
-    180deg,
-    #160c20,
-    #07040b
-  );
-
-  border-radius:
-  5px 5px 0 0;
-
-}
-
-
-.castle-tower {
-
-  position: absolute;
-
-  bottom: 0;
-
-  width: 70px;
-
-  background:
-  #0a0610;
-
-}
-
-
-.tower1 {
-
-  left: 40px;
-
-  height: 150px;
-
-}
-
-
-.tower2 {
-
-  right: 40px;
-
-  height: 170px;
-
-}
-
-
-.tower3 {
-
-  left: 185px;
-
-  height: 130px;
-
-}
-
-
-.castle-tower::before {
-
-  content: "";
-
-  position: absolute;
-
-  top: -30px;
-
-  left: -8px;
-
-  width: 0;
-
-  height: 0;
-
-  border-left:
-  43px solid transparent;
-
-  border-right:
-  43px solid transparent;
-
-  border-bottom:
-  35px solid #0a0610;
-
-}
-
-
-.castle-window {
-
-  position: absolute;
-
-  width: 10px;
-
-  height: 18px;
-
-  background:
-  #c96cff;
-
-  box-shadow:
-
-  0 0 12px
-  rgba(180,80,255,.8);
-
-  border-radius:
-  8px 8px 2px 2px;
-
-}
-
-
-.window1 {
-
-  left: 65px;
-
-  bottom: 60px;
-
-}
-
-
-.window2 {
-
-  left: 245px;
-
-  bottom: 75px;
-
-}
-
-
-.window3 {
-
-  right: 70px;
-
-  bottom: 75px;
-
-}
-
-
-/* =========================
-   GRAVEYARD
-========================= */
-
-.graveyard {
-
-  position: absolute;
-
-  bottom: 0;
-
-  width: 100%;
-
-  height: 100px;
-
-}
-
-
-.grave {
-
-  position: absolute;
-
-  bottom: 0;
-
-  width: 42px;
-
-  height: 65px;
-
-  background:
-  #120d18;
-
-  border:
-
-  1px solid
-  rgba(150,100,180,.2);
-
-  border-radius:
-  20px 20px 3px 3px;
-
-}
-
-
-.grave::after {
-
-  content: "✝";
-
-  position: absolute;
-
-  top: 10px;
-
-  left: 12px;
-
-  color:
-  rgba(180,130,200,.45);
-
-  font-size: 18px;
-
-}
-
-
-.grave1 {
-
-  left: 8%;
-
-  transform:
-  rotate(-5deg);
-
-}
-
-
-.grave2 {
-
-  left: 20%;
-
-  height: 50px;
-
-  transform:
-  rotate(4deg);
-
-}
-
-
-.grave3 {
-
-  right: 18%;
-
-  height: 70px;
-
-  transform:
-  rotate(-4deg);
-
-}
-
-
-.grave4 {
-
-  right: 5%;
-
-  height: 52px;
-
-  transform:
-  rotate(5deg);
-
-}
-
-
-/* =========================
-   SKULL
-========================= */
-
-.halloween-skull {
-
-  position: fixed;
-
-  left: 25px;
-
-  bottom: 25px;
-
-  font-size: 52px;
-
-  opacity: 0;
-
-  z-index: -2;
-
-  pointer-events: none;
-
-  filter:
-
-  drop-shadow(
-    0 0 15px
-    rgba(150,70,255,.4)
-  );
-
-  transform:
-  rotate(-8deg);
-
-  transition:
-  opacity .7s ease;
-
-}
-
-
-body.dark-theme
-.halloween-skull {
-
-  opacity: .65;
-
-}
-
-
-/* =========================
-   COFFIN
-========================= */
-
-.halloween-coffin {
-
-  position: fixed;
-
-  right: 35px;
-
-  bottom: 30px;
-
-  width: 48px;
-
-  height: 85px;
-
-  background:
-
-  linear-gradient(
-    135deg,
-    #3a1724,
-    #12070d
-  );
-
-  border:
-
-  2px solid
-  #6d2d48;
-
-  clip-path:
-
-  polygon(
-    25% 0,
-    75% 0,
-    100% 20%,
-    100% 80%,
-    75% 100%,
-    25% 100%,
-    0 80%,
-    0 20%
-  );
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  z-index: -2;
-
-  transition:
-  opacity .7s ease;
-
-  box-shadow:
-
-  0 0 25px
-  rgba(130,30,80,.25);
-
-}
-
-
-.halloween-coffin::after {
-
-  content: "✝";
-
-  position: absolute;
-
-  top: 23px;
-
-  left: 13px;
-
-  font-size: 22px;
-
-  color:
-  #9b6378;
-
-}
-
-
-body.dark-theme
-.halloween-coffin {
-
-  opacity: .8;
-
-}
-
-
-/* =========================
-   DARK THEME BUTTON
-========================= */
-
-body.dark-theme
-.download-btn {
-
-  background:
-
-  linear-gradient(
-    120deg,
-
-    #2b0d42,
-
-    #7c2bbd,
-
-    #bd4b92,
-
-    #2b0d42
-  );
-
-  background-size:
-  300% 300%;
-
-}
-
-
-body.dark-theme
-.download-btn:hover {
-
-  box-shadow:
-
-  0
-  15px
-  45px
-
-  rgba(160,70,255,.4),
-
-  0
-  0
-  30px
-
-  rgba(220,70,150,.2);
-
-}
-
-/* =========================
-   NAV
-========================= */
-
-nav {
-
-  width:
-  min(1100px,90%);
-
-  margin:
-  20px auto;
-
-  padding:
-  16px 20px;
-
-  display: flex;
-
-  justify-content:
-  space-between;
-
-  align-items:
-  center;
-
-  background:
-  var(--glass);
-
-  backdrop-filter:
-  blur(25px);
-
-  -webkit-backdrop-filter:
-  blur(25px);
-
-  border:
-
-  1px solid
-  var(--border);
-
-  border-radius:
-  22px;
-
-  animation:
-  navEnter
-  .8s
-  ease;
-
-}
-
-
-@keyframes navEnter {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-    translateY(-20px);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-    translateY(0);
-
-  }
-
-}
-
-
-.logo {
-
-  font-size: 18px;
-
-  font-weight: 700;
-
-  letter-spacing: 2px;
-
-}
-
-
-.logo span {
-
-  color:
-  var(--accent);
-
-}
-
-
-/* =========================
-   MENU BUTTON
-========================= */
-
-.menu-btn {
-
-  width: 46px;
-
-  height: 46px;
-
-  border-radius: 14px;
-
-  border:
-
-  1px solid
-  var(--border);
-
-  background:
-  rgba(255,255,255,.05);
-
-  color: white;
-
-  font-size: 23px;
-
-  cursor: pointer;
-
-  transition: .3s;
-
-}
-
-
-.menu-btn:hover {
-
-  transform:
-  scale(1.07);
-
-  background:
-
-  rgba(
-    var(--accent-rgb),
-    .18
-  );
-
-  border-color:
-  var(--accent);
-
-}
-
-
-/* =========================
-   OVERLAY
-========================= */
-
-.menu-overlay {
-
-  position: fixed;
-
-  inset: 0;
-
-  background:
-  rgba(0,0,0,.45);
-
-  backdrop-filter:
-  blur(5px);
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transition: .3s;
-
-  z-index: 20;
-
-}
-
-
-.menu-overlay.active {
-
-  opacity: 1;
-
-  pointer-events: auto;
-
-}
-
-
-/* =========================
-   SIDE MENU
-========================= */
-
-.side-menu {
-
-  position: fixed;
-
-  top: 0;
-
-  right: -380px;
-
-  width:
-  min(360px,90%);
-
-  height: 100vh;
-
-  padding: 25px;
-
-  background:
-  rgba(15,15,25,.88);
-
-  backdrop-filter:
-  blur(30px);
-
-  border-left:
-
-  1px solid
-  var(--border);
-
-  z-index: 30;
-
-  transition:
-
-  .4s
-  cubic-bezier(
-    .2,
-    .8,
-    .2,
-    1
-  );
-
-  overflow-y: auto;
-
-}
-
-
-.side-menu.active {
-
-  right: 0;
-
-}
-
-
-.menu-header {
-
-  display: flex;
-
-  justify-content:
-  space-between;
-
-  align-items:
-  center;
-
-  margin-bottom: 30px;
-
-}
-
-
-.close-btn,
-.back-btn {
-
-  width: 42px;
-
-  height: 42px;
-
-  border-radius: 12px;
-
-  border:
-
-  1px solid
-  var(--border);
-
-  background:
-  transparent;
-
-  color: white;
-
-  font-size: 20px;
-
-  cursor: pointer;
-
-}
-
-
-/* =========================
-   MENU PAGES
-========================= */
-
-.menu-page {
-
-  display: none;
-
-  animation:
-  pageEnter
-  .3s
-  ease;
-
-}
-
-
-.menu-page.active {
-
-  display: block;
-
-}
-
-
-@keyframes pageEnter {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-    translateX(20px);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-    translateX(0);
-
-  }
-
-}
-
-
-.settings-option {
-
-  width: 100%;
-
-  padding: 18px;
-
-  margin-bottom: 12px;
-
-  display: flex;
-
-  justify-content:
-  space-between;
-
-  align-items:
-  center;
-
-  border-radius: 16px;
-
-  border:
-
-  1px solid
-  var(--border);
-
-  background:
-  rgba(255,255,255,.05);
-
-  color: white;
-
-  font-size: 16px;
-
-  cursor: pointer;
-
-  transition: .3s;
-
-}
-
-
-.settings-option:hover {
-
-  transform:
-  translateX(5px);
-
-  border-color:
-  var(--accent);
-
-}
-
-
-.page-header {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 15px;
-
-  margin-bottom: 25px;
-
-}
-
-
-.option-list {
+  z-index: 1;
 
   display: flex;
 
   flex-direction: column;
 
-  gap: 10px;
-
-}
-
-
-.list-option {
-
-  width: 100%;
-
-  padding: 17px;
-
-  display: flex;
-
   align-items: center;
 
-  gap: 14px;
+  justify-content: center;
 
-  border-radius: 15px;
+  min-height: 100vh;
 
-  border:
-
-  1px solid
-  var(--border);
-
-  background:
-  rgba(255,255,255,.05);
-
-  color: white;
-
-  font-size: 16px;
-
-  cursor: pointer;
-
-  transition: .3s;
-
-}
-
-
-.list-option:hover {
-
-  transform:
-  translateX(5px);
-
-  border-color:
-  var(--accent);
-
-}
-
-
-.list-dot {
-
-  width: 18px;
-
-  height: 18px;
-
-  border-radius: 50%;
-
-}
-
-
-.purple {
-  background: #8b5cf6;
-}
-
-.red {
-  background: #ef4444;
-}
-
-.blue {
-  background: #3b82f6;
-}
-
-.green {
-  background: #22c55e;
-}
-
-.pink {
-  background: #ec4899;
-}
-
-.cyber {
-  background: #00e5ff;
-}
-
-.orange {
-  background: #f97316;
-}
-
-.gold {
-  background: #eab308;
-}
-
-
-/* =========================
-   MAIN
-========================= */
-
-main {
-
-  width:
-  min(850px,90%);
-
-  margin:
-  80px auto;
+  padding: 60px 20px;
 
   text-align: center;
 
 }
 
 
-/* =========================
-   TAG
-========================= */
-
 .tag {
 
-  display:
-  inline-flex;
+  font-size: 14px;
 
-  align-items:
-  center;
+  color: var(--muted);
 
-  gap: 8px;
+  margin-bottom: 20px;
 
-  padding:
-  10px 18px;
+  text-transform: uppercase;
 
-  border-radius:
-  30px;
-
-  background:
-  var(--glass);
-
-  border:
-
-  1px solid
-  var(--border);
-
-  color:
-  var(--accent);
-
-  animation:
-  fadeUp
-  .7s
-  ease;
+  letter-spacing: 1.2px;
 
 }
 
 
-/* =========================
-   TITLE
-========================= */
-
 .title {
 
-  margin:
-  28px 0 18px;
+  font-size: 56px;
 
-  font-size:
-  clamp(
-    55px,
-    10vw,
-    100px
+  font-weight: 900;
+
+  margin-bottom: 15px;
+
+  background:
+
+  linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
   );
 
-  line-height: .9;
+  -webkit-background-clip: text;
 
-  letter-spacing:
-  -4px;
+  -webkit-text-fill-color: transparent;
 
-  animation:
-
-  titleEnter
-  1s
-  cubic-bezier(
-    .2,
-    .8,
-    .2,
-    1
-  );
+  background-clip: text;
 
 }
 
@@ -2867,7 +1110,7 @@ main {
 
   display: block;
 
-  color: white;
+  font-size: 48px;
 
 }
 
@@ -2876,134 +1119,48 @@ main {
 
   display: block;
 
-  margin-top: 10px;
-
-  background:
-
-  linear-gradient(
-
-    135deg,
-
-    var(--accent),
-
-    var(--accent2)
-
-  );
-
-  -webkit-background-clip:
-  text;
-
-  color:
-  transparent;
-
-}
-
-
-@keyframes titleEnter {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-
-    translateY(40px)
-
-    scale(.95);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-
-    translateY(0)
-
-    scale(1);
-
-  }
-
-}
-
-
-@keyframes fadeUp {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-    translateY(20px);
-
-  }
-
-
-  to {
-
-    opacity: 1;
-
-    transform:
-    translateY(0);
-
-  }
+  font-size: 48px;
 
 }
 
 
 .description {
 
-  color:
-  var(--muted);
+  font-size: 18px;
 
-  line-height: 1.7;
+  color: var(--muted);
 
-  font-size: 17px;
+  margin-bottom: 45px;
+
+  max-width: 600px;
 
 }
 
 
-/* =========================
-   CONVERTER
-========================= */
-
 .converter {
 
-  margin-top: 50px;
+  width: 100%;
 
-  padding: 30px;
+  max-width: 600px;
+
+  padding: 40px;
 
   background:
-
-  linear-gradient(
-
-    145deg,
-
-    rgba(255,255,255,.09),
-
-    rgba(255,255,255,.035)
-
-  );
-
-  backdrop-filter:
-  blur(35px);
+  var(--glass);
 
   border:
-
   1px solid
   var(--border);
 
-  border-radius:
-  30px;
+  border-radius: 16px;
 
-  box-shadow:
+  backdrop-filter: blur(10px);
 
-  0
-  25px
-  80px
-  rgba(0,0,0,.25);
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 20px;
 
 }
 
@@ -3016,80 +1173,69 @@ main {
 
   display: flex;
 
-  gap: 10px;
-
-  padding: 7px;
-
-  width: fit-content;
-
-  margin:
-  0 auto 25px;
-
-  border-radius:
-  18px;
+  gap: 12px;
 
   background:
-  rgba(0,0,0,.2);
+  rgba(0, 0, 0, 0.3);
 
-  border:
+  padding: 6px;
 
-  1px solid
-  var(--border);
+  border-radius: 10px;
 
 }
 
 
 .format-btn {
 
+  flex: 1;
+
+  padding: 12px 16px;
+
+  background: transparent;
+
+  color: var(--text);
+
   border: none;
 
-  background:
-  transparent;
+  border-radius: 8px;
 
-  color:
-  var(--muted);
+  font-size: 14px;
 
-  padding:
-  13px 24px;
-
-  border-radius:
-  13px;
-
-  font-size: 16px;
+  font-weight: 600;
 
   cursor: pointer;
 
-  transition: .35s;
+  transition:
+
+  all .3s ease;
+
+}
+
+
+.format-btn:hover {
+
+  background:
+  rgba(255, 255, 255, 0.05);
 
 }
 
 
 .format-btn.active {
 
-  color: white;
-
   background:
 
   linear-gradient(
-
     135deg,
-
     var(--accent),
-
     var(--accent2)
-
   );
+
+  color: #fff;
 
   box-shadow:
 
-  0
-  8px
-  30px
-
-  rgba(
-    var(--accent-rgb),
-    .3
-  );
+  0 4px 15px
+  rgba(var(--accent-rgb), 0.4);
 
 }
 
@@ -3104,6 +1250,8 @@ main {
 
   gap: 12px;
 
+  width: 100%;
+
 }
 
 
@@ -3111,257 +1259,153 @@ main {
 
   flex: 1;
 
-  padding: 18px;
+  padding: 14px 16px;
 
-  border-radius:
-  16px;
+  background:
+  rgba(255, 255, 255, 0.03);
 
   border:
-
   1px solid
   var(--border);
 
-  background:
-  rgba(255,255,255,.06);
+  color: var(--text);
 
-  color: white;
+  border-radius: 10px;
+
+  font-size: 15px;
 
   outline: none;
 
-  font-size: 15px;
+  transition:
+
+  all .3s ease;
 
 }
 
 
 .url-input:focus {
 
+  background:
+  rgba(255, 255, 255, 0.06);
+
   border-color:
   var(--accent);
 
   box-shadow:
 
-  0
-  0
-  0
-  4px
-
-  rgba(
-    var(--accent-rgb),
-    .1
-  );
+  0 0 12px
+  rgba(var(--accent-rgb), 0.3);
 
 }
 
 
-/* =========================
-   DOWNLOAD BUTTON
-========================= */
+.url-input::placeholder {
+
+  color:
+  rgba(var(--text), 0.4);
+
+}
+
 
 .download-btn {
 
-  min-width: 150px;
-
-  padding:
-  18px 25px;
-
-  border: none;
-
-  border-radius:
-  16px;
+  padding: 14px 28px;
 
   background:
 
   linear-gradient(
-
     135deg,
-
     var(--accent),
-
     var(--accent2)
-
   );
 
-  background-size:
-  200% 200%;
+  color: #fff;
 
-  animation:
+  border: none;
 
-  buttonBlend
-  6s
-  ease
-  infinite;
+  border-radius: 10px;
 
-  color: white;
+  font-weight: 600;
 
-  font-weight: bold;
-
-  font-size: 15px;
+  font-size: 14px;
 
   cursor: pointer;
 
   transition:
 
-  transform .3s ease,
+  all .3s ease;
 
-  box-shadow .3s ease;
-
-}
-
-
-body.spider-theme .download-btn {
-
-  background:
-
-  linear-gradient(
-    120deg,
-    #35284D,
-    #B11313,
-    #35284D,
-    #B11313
-  );
-
-  background-size: 300% 300%;
-
-}
-
-
-body.galaxy-theme .download-btn {
-
-  background:
-
-  linear-gradient(
-    120deg,
-    #1e1b4b,
-    #7c3aed,
-    #ec4899,
-    #1e1b4b
-  );
-
-  background-size: 300% 300%;
-
-}
-
-
-/* AQUA OCEAN BUTTON */
-
-body.ocean-theme .download-btn {
-
-  background:
-
-  linear-gradient(
-    120deg,
-    #003b5c,
-    #00e5ff,
-    #00b8d4,
-    #0077ff,
-    #003b5c
-  );
-
-  background-size: 300% 300%;
-
-}
-
-
-@keyframes buttonBlend {
-
-  0% {
-
-    background-position:
-    0% 50%;
-
-  }
-
-
-  50% {
-
-    background-position:
-    100% 50%;
-
-  }
-
-
-  100% {
-
-    background-position:
-    0% 50%;
-
-  }
+  white-space: nowrap;
 
 }
 
 
 .download-btn:hover {
 
-  transform:
-  translateY(-3px);
+  transform: translateY(-2px);
 
   box-shadow:
 
-  0
-  15px
-  40px
-
-  rgba(
-    var(--accent-rgb),
-    .35
-  ),
-
-  0
-  10px
-  30px
-
-  rgba(0,0,0,.35);
+  0 8px 20px
+  rgba(var(--accent-rgb), 0.4);
 
 }
 
 
 .download-btn:active {
 
-  transform:
-  scale(.97);
+  transform: translateY(0);
+
+}
+
+
+.download-btn:disabled {
+
+  opacity: .6;
+
+  cursor: not-allowed;
 
 }
 
 
 /* =========================
-   STATUS
+   STATUS BOX
 ========================= */
 
 .status-box {
 
   display: none;
 
-  margin-top: 25px;
+  flex-direction: column;
 
-  padding: 22px;
+  align-items: center;
 
-  border-radius:
-  18px;
+  gap: 15px;
+
+  padding: 20px;
 
   background:
-  rgba(255,255,255,.05);
+  rgba(0, 0, 0, 0.2);
 
-  border:
+  border-radius: 10px;
 
-  1px solid
-  var(--border);
+  min-height: 80px;
 
 }
 
 
 .loader {
 
-  width: 36px;
+  display: none;
 
-  height: 36px;
+  width: 40px;
 
-  margin:
-  0 auto 15px;
+  height: 40px;
 
   border:
 
   3px solid
-  rgba(255,255,255,.1);
+  rgba(var(--accent-rgb), 0.3);
 
   border-top-color:
   var(--accent);
@@ -3369,8 +1413,8 @@ body.ocean-theme .download-btn {
   border-radius: 50%;
 
   animation:
-  spin
-  .8s
+
+  spin .6s
   linear
   infinite;
 
@@ -3391,20 +1435,25 @@ body.ocean-theme .download-btn {
 
 .status-text {
 
-  color:
-  var(--muted);
+  font-size: 14px;
+
+  color: var(--muted);
 
 }
 
 
+/* =========================
+   INFO
+========================= */
+
 .info {
 
-  margin-top: 20px;
+  font-size: 13px;
 
   color:
-  var(--muted);
+  rgba(var(--text), 0.5);
 
-  font-size: 13px;
+  text-align: center;
 
 }
 
@@ -3415,47 +1464,263 @@ body.ocean-theme .download-btn {
 
 footer {
 
-  text-align: center;
+  position: fixed;
 
-  padding: 35px;
+  bottom: 20px;
 
-  color: #666;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  font-size: 12px;
+
+  color: var(--muted);
 
 }
 
 
 /* =========================
-   MOBILE
+   MENU
 ========================= */
 
-@media(max-width:600px) {
+.menu-btn {
 
-  nav {
+  background: none;
 
-    width: 92%;
+  border: none;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  color: var(--text);
+
+}
+
+
+nav {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  right: 0;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 20px 30px;
+
+  background:
+  rgba(0, 0, 0, 0.5);
+
+  backdrop-filter: blur(10px);
+
+  border-bottom:
+
+  1px solid
+  var(--border);
+
+  z-index: 100;
+
+}
+
+
+.logo {
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  background:
+
+  linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent2)
+  );
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+}
+
+
+.logo span {
+
+  letter-spacing: 2px;
+
+}
+
+
+.side-menu {
+
+  position: fixed;
+
+  left: 0;
+
+  top: 0;
+
+  width: 250px;
+
+  height: 100vh;
+
+  background:
+  rgba(0, 0, 0, 0.8);
+
+  backdrop-filter: blur(10px);
+
+  border-right:
+
+  1px solid
+  var(--border);
+
+  z-index: 200;
+
+  transform: translateX(-100%);
+
+  transition:
+  transform .3s ease;
+
+  display: flex;
+
+  flex-direction: column;
+
+  padding: 80px 20px 20px;
+
+  gap: 10px;
+
+}
+
+
+.side-menu.active {
+
+  transform: translateX(0);
+
+}
+
+
+.menu-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0);
+
+  z-index: 150;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition:
+
+  background .3s ease,
+
+  opacity .3s ease;
+
+}
+
+
+.menu-overlay.active {
+
+  background: rgba(0, 0, 0, 0.5);
+
+  opacity: 1;
+
+  pointer-events: auto;
+
+}
+
+
+.list-option {
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--text);
+
+  padding: 12px 16px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition:
+  all .3s ease;
+
+  text-align: left;
+
+}
+
+
+.list-option:hover {
+
+  background:
+  rgba(var(--accent-rgb), 0.1);
+
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+
+  main {
+
+    padding: 80px 20px 60px;
 
   }
 
 
-  main {
+  .title {
 
-    margin:
-    60px auto;
+    font-size: 40px;
+
+  }
+
+
+  .title .download,
+  .title .videos {
+
+    font-size: 36px;
+
+  }
+
+
+  .description {
+
+    font-size: 16px;
+
+    margin-bottom: 30px;
 
   }
 
 
   .converter {
 
-    padding: 18px;
+    padding: 30px 20px;
 
   }
 
 
   .url-box {
 
-    flex-direction:
-    column;
+    flex-direction: column;
 
   }
 
@@ -3466,137 +1731,49 @@ footer {
 
   }
 
-
-  .title {
-
-    letter-spacing:
-    -2px;
-
-  }
-
-
-  .saturn {
-
-    width: 200px;
-
-    height: 200px;
-
-    right: -65px;
-
-    bottom: -45px;
-
-  }
-
-
-  .saturn-planet {
-
-    width: 125px;
-
-    height: 125px;
-
-    left: 35px;
-
-    top: 35px;
-
-  }
-
-
-  .saturn-ring-back,
-  .saturn-ring-front {
-
-    width: 200px;
-
-    height: 65px;
-
-    top: 68px;
-
-    border-width: 11px;
-
-  }
-
-
-  .spider-container {
-
-    right: 5%;
-
-  }
-
 }
 
 </style>
 
 </head>
 
-
 <body>
-
-
-<!-- =====================
-     BACKGROUND
-===================== -->
 
 <div class="background">
 
-  <div
-  class="blob blob1"
-  ></div>
+  <div class="blob blob1"></div>
 
-  <div
-  class="blob blob2"
-  ></div>
+  <div class="blob blob2"></div>
 
 </div>
 
+<div class="galaxy-stars"></div>
 
-<!-- =====================
-     GALAXY STARS
-===================== -->
-
-<div
-class="galaxy-stars"
-></div>
-
-
-<div
-class="sparkles"
->
+<div class="sparkles">
 
   <div class="sparkle"></div>
+
   <div class="sparkle"></div>
+
   <div class="sparkle"></div>
+
   <div class="sparkle"></div>
+
   <div class="sparkle"></div>
+
   <div class="sparkle"></div>
 
 </div>
 
+<div class="saturn">
 
-<!-- =====================
-     SATURN
-===================== -->
+  <div class="saturn-ring-back"></div>
 
-<div
-class="saturn"
->
+  <div class="saturn-planet"></div>
 
-  <div
-  class="saturn-ring-back"
-  ></div>
-
-  <div
-  class="saturn-planet"
-  ></div>
-
-  <div
-  class="saturn-ring-front"
-  ></div>
+  <div class="saturn-ring-front"></div>
 
 </div>
-
-
-<!-- =====================
-     OCEAN WAVES
-===================== -->
 
 <div class="ocean-waves">
 
@@ -3608,178 +1785,21 @@ class="saturn"
 
 </div>
 
-
-<!-- =====================
-     OCEAN BUBBLES
-===================== -->
-
 <div class="ocean-bubbles">
 
   <div class="bubble"></div>
+
   <div class="bubble"></div>
+
   <div class="bubble"></div>
-  <div class="bubble"></div>
+
   <div class="bubble"></div>
 
 </div>
 
+<div class="spider-web web-left"></div>
 
-<!-- =====================
-     SPIDER WEBS
-===================== -->
-
-<div
-class="spider-web web-left"
-></div>
-
-
-<div
-class="spider-web web-right"
-></div>
-
-
-<!-- =====================
-     SPIDER
-===================== -->
-
-<div
-class="spider-container"
->
-
-  <div
-  class="spider-thread"
-  ></div>
-
-
-  <div
-  class="spider"
-  >
-
-    <div
-    class="spider-body"
-    ></div>
-
-    <div
-    class="spider-leg leg1"
-    ></div>
-
-    <div
-    class="spider-leg leg2"
-    ></div>
-
-    <div
-    class="spider-leg leg3"
-    ></div>
-
-    <div
-    class="spider-leg leg4"
-    ></div>
-
-  </div>
-
-</div>
-   
-<!-- =====================
-     HALLOWEEN THEME
-===================== -->
-
-<div class="halloween-scene">
-
-  <!-- Stars -->
-  <div class="halloween-stars"></div>
-
-  <!-- Moon -->
-  <div class="halloween-moon">
-
-    <div class="moon-crater crater1"></div>
-
-    <div class="moon-crater crater2"></div>
-
-    <div class="moon-crater crater3"></div>
-
-  </div>
-
-
-  <!-- Witch -->
-  <div class="halloween-witch">
-    🧙‍♀️
-  </div>
-
-
-  <!-- Bats -->
-
-  <div class="halloween-bat bat1">
-    🦇
-  </div>
-
-  <div class="halloween-bat bat2">
-    🦇
-  </div>
-
-  <div class="halloween-bat bat3">
-    🦇
-  </div>
-
-  <div class="halloween-bat bat4">
-    🦇
-  </div>
-
-
-  <!-- Fog -->
-
-  <div class="halloween-fog"></div>
-
-  <div class="halloween-fog fog2"></div>
-
-
-  <!-- Haunted Castle -->
-
-  <div class="haunted-castle">
-
-    <div class="castle-base"></div>
-
-    <div class="castle-tower tower1"></div>
-
-    <div class="castle-tower tower2"></div>
-
-    <div class="castle-tower tower3"></div>
-
-    <div class="castle-window window1"></div>
-
-    <div class="castle-window window2"></div>
-
-    <div class="castle-window window3"></div>
-
-  </div>
-
-
-  <!-- Graveyard -->
-
-  <div class="graveyard">
-
-    <div class="grave grave1"></div>
-
-    <div class="grave grave2"></div>
-
-    <div class="grave grave3"></div>
-
-    <div class="grave grave4"></div>
-
-  </div>
-
-</div>
-
-
-<!-- Skull -->
-
-<div class="halloween-skull">
-  💀
-</div>
-
-
-<!-- Coffin -->
-
-<div class="halloween-coffin"></div>
+<div class="spider-web web-right"></div>
 
 <!-- =====================
      MENU OVERLAY
@@ -3791,7 +1811,6 @@ id="menuOverlay"
 onclick="closeMenu()"
 ></div>
 
-
 <!-- =====================
      SIDE MENU
 ===================== -->
@@ -3801,231 +1820,47 @@ class="side-menu"
 id="sideMenu"
 >
 
-  <div
-  class="menu-page active"
-  id="mainSettings"
+  <div style="flex: 1;"></div>
+
+  <button
+  class="list-option"
+  onclick="setTheme('ocean')"
   >
+    🌊 Ocean Theme
+  </button>
 
-    <div
-    class="menu-header"
-    >
-
-      <h2>Settings</h2>
-
-      <button
-      class="close-btn"
-      onclick="closeMenu()"
-      >
-        ✕
-      </button>
-
-    </div>
-
-
-    <button
-    class="settings-option"
-    onclick="openPage('coloursPage')"
-    >
-
-      <span>
-        🎨 Colours
-      </span>
-
-      <span>
-        →
-      </span>
-
-    </button>
-
-
-    <button
-    class="settings-option"
-    onclick="openPage('themesPage')"
-    >
-
-      <span>
-        ✨ Themes
-      </span>
-
-      <span>
-        →
-      </span>
-
-    </button>
-
-  </div>
-
-
-  <!-- =====================
-       COLOURS PAGE
-  ===================== -->
-
-  <div
-  class="menu-page"
-  id="coloursPage"
+  <button
+  class="list-option"
+  onclick="setTheme('galaxy')"
   >
+    🌌 Galaxy Theme
+  </button>
 
-    <div class="page-header">
-
-      <button
-      class="back-btn"
-      onclick="goBack()"
-      >
-        ←
-      </button>
-
-      <h2>Colours</h2>
-
-    </div>
-
-
-    <div class="option-list">
-
-      <button
-      class="list-option"
-      onclick="setColour('purple')"
-      >
-        <span class="list-dot purple"></span>
-        Purple
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('red')"
-      >
-        <span class="list-dot red"></span>
-        Red
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('blue')"
-      >
-        <span class="list-dot blue"></span>
-        Blue
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('green')"
-      >
-        <span class="list-dot green"></span>
-        Green
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('pink')"
-      >
-        <span class="list-dot pink"></span>
-        Pink
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('cyber')"
-      >
-        <span class="list-dot cyber"></span>
-        Cyber
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('orange')"
-      >
-        <span class="list-dot orange"></span>
-        Orange
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setColour('gold')"
-      >
-        <span class="list-dot gold"></span>
-        Gold
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- =====================
-       THEMES PAGE
-  ===================== -->
-
-  <div
-  class="menu-page"
-  id="themesPage"
+  <button
+  class="list-option"
+  onclick="setTheme('spider')"
   >
+    🕷️ Spider Theme
+  </button>
 
-    <div class="page-header">
+  <button
+  class="list-option"
+  onclick="setTheme('dark')"
+  >
+    🌙 Dark Theme
+  </button>
 
-      <button
-      class="back-btn"
-      onclick="goBack()"
-      >
-        ←
-      </button>
-
-      <h2>Themes</h2>
-
-    </div>
-
-
-    <div class="option-list">
-
-      <button
-      class="list-option"
-      onclick="setTheme('spider')"
-      >
-        🕷️ Spider Theme
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setTheme('galaxy')"
-      >
-        🌌 Galaxy Theme
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setTheme('ocean')"
-      >
-        🌊 Ocean Theme
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setTheme('dark')"
-      >
-        🌙 Dark Theme
-      </button>
-
-
-      <button
-      class="list-option"
-      onclick="setTheme('default')"
-      >
-        ✨ Default Theme
-      </button>
-
-    </div>
-
-  </div>
+  <button
+  class="list-option"
+  onclick="setTheme('default')"
+  >
+    ✨ Default Theme
+  </button>
 
 </div>
+
+</div>
+
 <!-- =====================
      NAV
 ===================== -->
@@ -4073,8 +1908,8 @@ id="sideMenu"
 
   <p class="description">
 
-    Download direct media files or convert your media
-    into MP3 audio.
+    Download YouTube videos, direct media files or convert
+    your media into MP3 audio.
 
   </p>
 
@@ -4138,7 +1973,7 @@ id="sideMenu"
 
       type="url"
 
-      placeholder="Paste direct media URL..."
+      placeholder="Paste YouTube or media URL..."
 
       >
 
@@ -4202,7 +2037,7 @@ id="sideMenu"
 
     >
 
-      Supports publicly accessible direct media file URLs.
+      Supports YouTube, TikTok, Instagram, and direct media file URLs.
 
     </div>
 
@@ -4261,47 +2096,39 @@ function closeMenu() {
 
 
 /* ======================
-   MENU PAGES
+   THEME
 ====================== */
 
-function openPage(pageId) {
+function setTheme(theme) {
 
-  document
-    .querySelectorAll(".menu-page")
-    .forEach(function(page) {
+  const body = document.body;
 
-      page
-        .classList
-        .remove("active");
+  body.classList.remove(
+    "ocean-theme",
+    "galaxy-theme",
+    "spider-theme",
+    "dark-theme"
+  );
 
-    });
+  if (theme === "ocean") {
 
+    body.classList.add("ocean-theme");
 
-  document
-    .getElementById(pageId)
-    .classList
-    .add("active");
+  } else if (theme === "galaxy") {
 
-}
+    body.classList.add("galaxy-theme");
 
+  } else if (theme === "spider") {
 
-function goBack() {
+    body.classList.add("spider-theme");
 
-  document
-    .querySelectorAll(".menu-page")
-    .forEach(function(page) {
+  } else if (theme === "dark") {
 
-      page
-        .classList
-        .remove("active");
+    body.classList.add("dark-theme");
 
-    });
+  }
 
-
-  document
-    .getElementById("mainSettings")
-    .classList
-    .add("active");
+  closeMenu();
 
 }
 
@@ -4317,47 +2144,31 @@ function setFormat(format) {
 
   selectedFormat = format;
 
+  const mp4Btn =
+    document.getElementById("mp4Btn");
 
-  document
-    .getElementById("mp4Btn")
-    .classList
-    .toggle(
-      "active",
-      format === "mp4"
-    );
-
-
-  document
-    .getElementById("mp3Btn")
-    .classList
-    .toggle(
-      "active",
-      format === "mp3"
-    );
-
+  const mp3Btn =
+    document.getElementById("mp3Btn");
 
   const input =
-    document.getElementById(
-      "urlInput"
-    );
-
+    document.getElementById("urlInput");
 
   const button =
-    document.getElementById(
-      "downloadBtn"
-    );
-
+    document.getElementById("downloadBtn");
 
   const info =
-    document.getElementById(
-      "infoText"
-    );
+    document.getElementById("infoText");
 
 
   if (format === "mp3") {
 
+    mp3Btn.classList.add("active");
+
+    mp4Btn.classList.remove("active");
+
+
     input.placeholder =
-      "Paste direct video/audio URL...";
+      "Paste YouTube or media URL...";
 
 
     button.innerText =
@@ -4373,7 +2184,7 @@ function setFormat(format) {
   else {
 
     input.placeholder =
-      "Paste direct media URL...";
+      "Paste YouTube or media URL...";
 
 
     button.innerText =
@@ -4381,7 +2192,7 @@ function setFormat(format) {
 
 
     info.innerText =
-      "Supports publicly accessible direct media file URLs.";
+      "Supports YouTube, TikTok, Instagram, and direct media file URLs.";
 
   }
 
@@ -4436,7 +2247,7 @@ async function downloadMedia() {
 
 
   statusBox.style.display =
-    "block";
+    "flex";
 
 
   loader.style.display =
@@ -4449,7 +2260,7 @@ async function downloadMedia() {
 
     ? "Converting media to MP3..."
 
-    : "Connecting to media server...";
+    : "Downloading video...";
 
 
   button.disabled = true;
@@ -4461,9 +2272,10 @@ async function downloadMedia() {
 
   try {
 
-    /* SAME WEBSITE BACKEND */
+    /* PYTHON FLASK BACKEND */
 
-    const backendURL = "";
+    const backendURL = 
+      window.location.origin;
 
 
     /* SELECT API */
@@ -4570,7 +2382,7 @@ async function downloadMedia() {
 
       ? "audio.mp3"
 
-      : "media.mp4";
+      : "video.mp4";
 
 
     document.body.appendChild(
@@ -4631,322 +2443,6 @@ async function downloadMedia() {
       "1";
 
   }
-
-}
-
-      
-    
-    
-/* ======================
-   COLOURS
-====================== */
-
-function setColour(colour) {
-
-  const colours = {
-
-    purple: {
-
-      c1: "#8b5cf6",
-
-      c2: "#4f46e5",
-
-      rgb: "139, 92, 246"
-
-    },
-
-
-    red: {
-
-      c1: "#ef4444",
-
-      c2: "#b91c1c",
-
-      rgb: "239, 68, 68"
-
-    },
-
-
-    blue: {
-
-      c1: "#3b82f6",
-
-      c2: "#1d4ed8",
-
-      rgb: "59, 130, 246"
-
-    },
-
-
-    green: {
-
-      c1: "#22c55e",
-
-      c2: "#15803d",
-
-      rgb: "34, 197, 94"
-
-    },
-
-
-    pink: {
-
-      c1: "#ec4899",
-
-      c2: "#be185d",
-
-      rgb: "236, 72, 153"
-
-    },
-
-
-    cyber: {
-
-      c1: "#00e5ff",
-
-      c2: "#0891b2",
-
-      rgb: "0, 229, 255"
-
-    },
-
-
-    orange: {
-
-      c1: "#f97316",
-
-      c2: "#c2410c",
-
-      rgb: "249, 115, 22"
-
-    },
-
-
-    gold: {
-
-      c1: "#eab308",
-
-      c2: "#a16207",
-
-      rgb: "234, 179, 8"
-
-    }
-
-  };
-
-
-  const picked =
-    colours[colour];
-
-
-  if (!picked) {
-
-    return;
-
-  }
-
-
-  document
-    .documentElement
-    .style
-    .setProperty(
-
-      "--accent",
-
-      picked.c1
-
-    );
-
-
-  document
-    .documentElement
-    .style
-    .setProperty(
-
-      "--accent2",
-
-      picked.c2
-
-    );
-
-
-  document
-    .documentElement
-    .style
-    .setProperty(
-
-      "--accent-rgb",
-
-      picked.rgb
-
-    );
-
-
-  /* SAVE COLOUR */
-
-  localStorage.setItem(
-
-    "colour",
-
-    colour
-
-  );
-
-
-  /* Colour choose karne ke baad
-     menu automatically close */
-
-  closeMenu();
-
-}
-
-
-/* ======================
-   THEMES
-====================== */
-
-   function setTheme(theme) {
-
-  /* REMOVE ALL THEMES */
-
-  document.body.classList.remove(
-
-    "galaxy-theme",
-
-    "spider-theme",
-
-    "ocean-theme",
-
-    "dark-theme"
-
-  );
-
-
-  /* GALAXY */
-
-  if (theme === "galaxy") {
-
-    document.body.classList.add(
-      "galaxy-theme"
-    );
-
-  }
-
-
-  /* SPIDER */
-
-  else if (theme === "spider") {
-
-    document.body.classList.add(
-      "spider-theme"
-    );
-
-  }
-
-
-  /* OCEAN */
-
-  else if (theme === "ocean") {
-
-    document.body.classList.add(
-      "ocean-theme"
-    );
-
-  }
-
-
-  /* DARK / HALLOWEEN */
-
-  else if (theme === "dark") {
-
-    document.body.classList.add(
-      "dark-theme"
-    );
-
-  }
-
-
-  /* DEFAULT */
-
-  else if (theme === "default") {
-
-    document.body.style.removeProperty(
-      "--accent"
-    );
-
-    document.body.style.removeProperty(
-      "--accent2"
-    );
-
-    document.body.style.removeProperty(
-      "--accent-rgb"
-    );
-
-  }
-
-
-  /* SAVE THEME */
-
-  localStorage.setItem(
-    "websiteTheme",
-    theme
-  );
-
-}
-
-
-
-/* ======================
-   LOAD SAVED SETTINGS
-====================== */
-
-const savedColour =
-
-  localStorage.getItem(
-    "colour"
-  );
-
-
-const savedWebsiteTheme =
-
-  localStorage.getItem(
-    "websiteTheme"
-  );
-
-
-/* LOAD THEME FIRST */
-
-if (savedWebsiteTheme) {
-
-  setTheme(
-    savedWebsiteTheme
-  );
-
-}
-
-
-/* LOAD COLOUR ONLY
-   WHEN NO SPECIAL THEME */
-
-if (
-
-  savedColour &&
-
-  (
-
-    !savedWebsiteTheme ||
-
-    savedWebsiteTheme === "default" ||
-
-    savedWebsiteTheme === "dark"
-
-  )
-
-) {
-
-  setColour(
-    savedColour
-  );
 
 }
 
