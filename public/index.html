@@ -5317,14 +5317,39 @@ async function downloadMedia() {
 
     }
 
+statusText.innerText =
+  selectedFormat === "mp3"
+  ? "Preparing MP3..."
+  : "Preparing file...";
 
-    statusText.innerText =
+const contentType =
+  (response.headers.get("content-type") || "").toLowerCase();
 
-      selectedFormat === "mp3"
+if (
+  contentType.includes("text/html") ||
+  contentType.includes("application/json")
+) {
+  const errorText = await response.text();
 
-      ? "Preparing MP3..."
+  let message = "Server returned an invalid response.";
 
-      : "Preparing file...";
+  try {
+    const data = JSON.parse(errorText);
+    message = data.error || message;
+  } catch (_) {
+    if (errorText.trim()) {
+      message = errorText.substring(0, 300);
+    }
+  }
+
+  throw new Error(message);
+}
+
+const blob = await response.blob();
+
+if (!blob.size) {
+  throw new Error("Server returned an empty file.");
+}
 
 
     /* GET FILE */
